@@ -1,0 +1,113 @@
+[project]
+name = "bpy_jupyter"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Sofus Albert Høgsbro Rose", email = "oscillode@sofusrose.com" },
+    { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
+]
+maintainers = [
+    { name = "Sofus Albert Høgsbro Rose", email = "oscillode@sofusrose.com" },
+    { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
+]
+readme = "README.md"
+requires-python = "~= 3.11"
+license = { text = "AGPL-3.0-or-later" }
+dependencies = [
+    "anywidget>=0.9.13",
+    "ipywidgets>=8.1.5",
+    "jupyterlab>=4.2.5",
+    "numpy>=2.0.2",
+    "polars>=1.11.0",
+    "pydantic>=2.9.2",
+    "quak>=0.2.0",
+    "sympy>=1.13.3",
+]
+
+[project.urls]
+Homepage = "https://kolibril13.github.io/bpy-gallery/"
+
+####################
+# - Blender Extension
+####################
+[tool.bl_ext]
+pretty_name = "BPY Jupyter"
+blender_version_min = '4.2.0'
+blender_version_max = '4.2.2'
+permissions = ["files", "network", "clipboard"]
+bl_tags = ["Development", "Import-Export", "Pipeline"]
+copyright = ["2024 bpy_jupyter Contributors"]
+
+# Platform Support
+## Map Valid Blender Platforms -> Required PyPi Platform Tags
+## Include as few PyPi tags as works on ~everything.
+[tool.bl_ext.platforms]
+windows-amd64 = ['win_amd64']
+macos-arm64 = ['macosx_11_0_arm64', 'macosx_12_0_arm64', 'macosx_14_0_arm64']
+linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64']
+
+#macos-x86_64 = ['macosx_10_10_x86_64']  ##TODO: Broken
+
+# Packaging
+## Path is from the directory containing this file.
+[tool.bl_ext.packaging]
+path_builds = 'dev/build'
+path_wheels = 'dev/wheels'
+path_local = 'dev/local'
+init_settings_filename = 'init_settings.toml'
+
+# "Profiles" -> Affects Initialization Settings
+## This sets the default extension preferences for different situations.
+[tool.bl_ext.profiles.test]
+use_path_local = true
+use_log_file = true
+log_file_path = 'bpy_jupyter.log'
+log_file_level = 'debug'
+use_log_console = true
+log_console_level = 'info'
+
+[tool.bl_ext.profiles.dev]
+use_path_local = true
+use_log_file = true
+log_file_path = 'bpy_jupyter.log'
+log_file_level = 'debug'
+use_log_console = true
+log_console_level = 'info'
+
+[tool.bl_ext.profiles.release]
+use_path_local = false
+use_log_file = true
+log_file_path = 'bpy_jupyter.log'
+log_file_level = 'info'
+use_log_console = true
+log_console_level = 'warning'
+
+[tool.bl_ext.profiles.release-debug]
+use_path_local = false
+use_log_file = true
+log_file_path = 'bpy_jupyter.log'
+log_file_level = 'debug'
+use_log_console = true
+log_console_level = 'warning'
+
+####################
+# - Blender Extension
+####################
+[tool.uv]
+managed = true
+dev-dependencies = [
+    "mypy>=1.13.0",
+    "pip>=24.2",
+    "rich>=13.9.3",
+    "ruff>=0.7.1",
+    "tomli-w>=1.1.0",
+]
+package = false
+
+####################
+# - Tooling: Ruff Formatter
+####################
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = false
