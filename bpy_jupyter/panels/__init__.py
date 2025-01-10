@@ -1,20 +1,20 @@
-"""Blender operators that ship with `bpy_jupyter`."""
+"""Blender panels that ship with `bpy_jupyter`."""
 
 from functools import reduce
 
 from .. import contracts as ct
-from . import start_jupyter_kernel
+from . import jupyter_panel
 
 BL_REGISTER: list[ct.BLClass] = [
-	*start_jupyter_kernel.BL_REGISTER,
+	*jupyter_panel.BL_REGISTER,
 ]
 BL_HANDLERS: ct.BLHandlers = reduce(
 	lambda a, b: a + b,
 	[
-		start_jupyter_kernel.BL_HANDLERS,
+		jupyter_panel.BL_HANDLERS,
 	],
 	ct.BLHandlers(),
 )
 BL_KEYMAP_ITEMS: list[ct.BLKeymapItem] = [
-	*start_jupyter_kernel.BL_KEYMAP_ITEMS,
+	*jupyter_panel.BL_KEYMAP_ITEMS,
 ]

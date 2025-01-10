@@ -3,9 +3,7 @@
 from functools import reduce
 
 from . import contracts as ct
-
-# from . import node_trees
-from . import operators, preferences, registration
+from . import operators, panels, preferences, registration
 from .utils import logger
 
 log = logger.get(__name__)
@@ -16,21 +14,21 @@ log = logger.get(__name__)
 ####################
 BL_REGISTER: list[ct.BLClass] = [
 	*operators.BL_REGISTER,
-	# *node_trees.BL_REGISTER,
+	*panels.BL_REGISTER,
 ]
 
 BL_HANDLERS: ct.BLHandlers = reduce(
 	lambda a, b: a + b,
 	[
 		operators.BL_HANDLERS,
-		# node_trees.BL_HANDLERS,
+		panels.BL_HANDLERS,
 	],
 	ct.BLHandlers(),
 )
 
 BL_KEYMAP_ITEMS: list[ct.BLKeymapItem] = [
 	*operators.BL_KEYMAP_ITEMS,
-	# node_trees.BL_KEYMAP_ITEMS,
+	*panels.BL_KEYMAP_ITEMS,
 ]
 
 
@@ -63,7 +61,7 @@ def register() -> None:
 
 		log.info('Finished Registration of Addon: %s', ct.addon.NAME)
 	else:
-		msg = 'Addon preferences did not register for addon {ct.addon.NAME} - something is very wrong!'
+		msg = f"Addon preferences did not register for addon '{ct.addon.NAME}' - something is very wrong!"
 		raise RuntimeError(msg)
 
 
