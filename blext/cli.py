@@ -79,7 +79,7 @@ def build(
 def dev(
 	os: SupportedOS = SupportedOS.linux_x64,
 	download_wheels: bool = True,
-	delete_existing_wheels: bool = False,
+	delete_existing_wheels: bool = True,
 ) -> None:
 	"""Launch Blender with the extension installed."""
 	profile = 'dev'
@@ -103,9 +103,18 @@ def dev(
 	path_zip = paths.PATH_BUILD / blext_spec.zip_filename()
 	path_bl_init_script = paths.PATH_ROOT / 'blext' / 'blender_python' / 'bl_init.py'
 
+	## Find Blender
+	## TODO: More thought-out method of finding the Blender executable across platforms.
+	if os == SupportedOS.linux_x64:
+		blender_executable = shutil.which('blender')
+	elif os == SupportedOS.mac_arm:
+		blender_executable = '/Applications/Blender.app/Contents/MacOS/Blender'
+	elif os == SupportedOS.windows_amd64:
+		blender_executable = shutil.which('blender.exe')
+
 	bl_process = subprocess.Popen(
 		[
-			shutil.which('blender'),
+			blender_executable,
 			'--python',
 			str(path_bl_init_script),
 			'--factory-startup',  ## Temporarily Disable All Addons
