@@ -61,7 +61,7 @@ def build(
 	console.rule('[bold yellow] Extension Validation...')
 	bl_process = subprocess.Popen(
 		[
-			'--no-addons',  ## For some reason this must be here lol
+			shutil.which('blender'),
 			'--factory-startup',  ## Temporarily Disable All Addons
 			'--command',  ## Validate an Extension
 			'extension',
@@ -69,7 +69,6 @@ def build(
 			str(path_zip),
 		],
 		bufsize=0,  ## TODO: Check if -1 is OK
-		executable=shutil.which('blender'),
 		env=_os.environ,
 	)
 	bl_process.wait()
@@ -106,13 +105,12 @@ def dev(
 
 	bl_process = subprocess.Popen(
 		[
-			'--no-addons',  ## For some reason this must be here lol
+			shutil.which('blender'),
 			'--python',
 			str(path_bl_init_script),
 			'--factory-startup',  ## Temporarily Disable All Addons
 		],
 		bufsize=0,  ## TODO: Check if -1 is OK
-		executable=shutil.which('blender'),
 		env=_os.environ
 		| {
 			'BLEXT_ADDON_NAME': blext_spec.id,
