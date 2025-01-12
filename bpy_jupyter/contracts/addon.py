@@ -36,3 +36,14 @@ def prefs() -> bpy.types.AddonPreferences | None:
 	if addon is None:
 		return None
 	return addon.preferences
+
+
+def addon_dir() -> Path:
+	"""Absolute path to a local addon-specific directory guaranteed to be writable."""
+	return Path(
+		bpy.utils.extension_path_user(
+			base_package,
+			path='',
+			create=True,
+		)
+	).resolve()

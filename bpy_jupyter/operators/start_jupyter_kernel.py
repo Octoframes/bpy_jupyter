@@ -57,7 +57,7 @@ class StartJupyterKernel(bpy.types.Operator):
 
 		match self.kernel_type:
 			case 'IPYKERNEL':
-				jkern.start_kernel()
+				jkern.start_kernel(ct.addon.addon_dir())
 
 			case 'MARIMO':
 				raise NotImplementedError

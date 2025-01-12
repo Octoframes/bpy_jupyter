@@ -22,6 +22,7 @@ dependencies = [
     "pydantic>=2.9.2",
     "jupyter-server>=2.14.2",
     "ipykernel>=6.29.5",
+    "pyxll-jupyter>=0.5.3",
 ]
 
 [project.urls]
@@ -46,7 +47,7 @@ network = 'Jupyter needs to expose a notebook server'
 [tool.bl_ext.platforms]
 windows-amd64 = ['win_amd64']
 macos-arm64 = ['macosx_11_0_arm64', 'macosx_12_0_arm64', 'macosx_14_0_arm64']
-linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64']
+linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64', 'manylinux_2_28_x86_64']
 
 #macos-x86_64 = ['macosx_10_10_x86_64']  ##TODO: Broken
 
