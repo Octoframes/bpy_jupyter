@@ -16,7 +16,7 @@ class SupportedOS(enum.StrEnum):
 	"""Operating systems supported by Blender extensions managed by BLExt."""
 
 	linux_x64 = 'linux-x64'
-	mac_arm = 'mac-arm64'
+	mac_arm = 'macos-arm64'
 	windows_amd64 = 'windows-amd64'
 
 
