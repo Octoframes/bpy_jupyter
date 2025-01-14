@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import bpyUsage
+import bpy
 import platformdirs
 
 from .. import contracts as ct
@@ -47,7 +47,7 @@ bpy.types.Scene.jupyter_notebook_dir = bpy.props.StringProperty(
 	name='Notebook Root Folder',
 	description='The default notebook folder.',
 	subtype='DIR_PATH',
-	default=platformdirs.user_documents_dir(),
+	default=platformdirs.user_desktop_dir(),
 )
 bpy.types.Scene.jupyter_launch_browser = bpy.props.BoolProperty(
 	name='Auto-Launch Browser?',
