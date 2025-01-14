@@ -10,6 +10,8 @@ _JUPYTER_KERNEL: IPKernelApp | None = None
 _JUPYTER_SERVER_PROC: subprocess.Popen | None = None
 _LOCK: threading.Lock = threading.Lock()
 
+_WAITING_TO_STOP: bool = False
+
 
 def is_kernel_running():
 	"""Check whether a kernel is running with low overhead."""
@@ -57,16 +59,32 @@ def stop_kernel() -> None:
 	with _LOCK:
 		# Stop the Jupyter Notebook Server
 		if _JUPYTER_SERVER_PROC is not None:
-			_JUPYTER_SERVER_PROC.terminate()
+			proc = _JUPYTER_SERVER_PROC
 			_JUPYTER_SERVER_PROC = None
+
+			proc.kill()
+			proc.wait()
+			del proc
 		else:
 			msg = 'No jupyter notebook server is running; cannot stop it'
 			raise ValueError(msg)
 
+		# Stop the Kernel Server
 		if _JUPYTER_KERNEL is not None:
-			# Stop the Jupyter Notebook Kernel
-			## - TODO: Actually stop it, don't just trust the GC.
+			_JUPYTER_KERNEL.kernel.do_shutdown(False)
 			_JUPYTER_KERNEL = None
 		else:
 			msg = 'No jupyter kernel is running; cannot stop it'
 			raise ValueError(msg)
+
+
+def queue_kernel_stop() -> None:
+	"""Check whether a kernel is running with low overhead."""
+	global _WAITING_TO_STOP  # noqa: PLW0603
+	with _LOCK:
+		_WAITING_TO_STOP = True
+
+
+def kernel_should_stop() -> bool:
+	with _LOCK:
+		return _WAITING_TO_STOP

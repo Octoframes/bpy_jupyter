@@ -9,3 +9,4 @@ class OperatorType(enum.StrEnum):
 	"""Identifiers for addon-defined `bpy.types.Operator`."""
 
 	StartJupyterKernel = f'{ADDON_NAME}.start_jupyter_kernel'
+	StopJupyterKernel = f'{ADDON_NAME}.stop_jupyter_kernel'

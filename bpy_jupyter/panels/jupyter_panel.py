@@ -12,11 +12,11 @@ bpy.types.Scene.jupyter_kernel_type = bpy.props.EnumProperty(
 			'IPyKernel',
 			'A traditional, well-tested Python notebook kernel',
 		),
-		(
-			'MARIMO',
-			'Marimo',
-			'A reactive, modern Python notebook kernel',
-		),
+		# (
+		# 'MARIMO',
+		# 'Marimo',
+		# 'A reactive, modern Python notebook kernel',
+		# ),
 	],
 	default='IPYKERNEL',
 )
@@ -61,8 +61,10 @@ class JupyterPanel(bpy.types.Panel):
 		layout.prop(context.scene, 'jupyter_kernel_type')
 
 		# Operator
-		op = layout.operator('bpy_jupyter.start_jupyter_kernel')
+		op = layout.operator(ct.OperatorType.StartJupyterKernel)
 		op.kernel_type = context.scene.jupyter_kernel_type
+
+		layout.operator(ct.OperatorType.StopJupyterKernel)
 
 
 ####################

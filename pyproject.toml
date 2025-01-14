@@ -3,15 +3,15 @@ name = "bpy_jupyter"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
-    { name = "Sofus Albert Høgsbro Rose", email = "oscillode@sofusrose.com" },
+    { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
     { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
 ]
 maintainers = [
-    { name = "Sofus Albert Høgsbro Rose", email = "oscillode@sofusrose.com" },
+    { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
     { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
 ]
 readme = "README.md"
-requires-python = "~= 3.11"
+requires-python = ">= 3.11"
 license = { text = "AGPL-3.0-or-later" }
 dependencies = [
     "rich>=13.9.3",
@@ -31,20 +31,20 @@ Homepage = "https://kolibril13.github.io/bpy-gallery/"
 ####################
 # - Blender Extension
 ####################
-[tool.bl_ext]
+[tool.blext]
 pretty_name = "BPY Jupyter"
 blender_version_min = '4.2.0'
 blender_version_max = '4.3.10'
 bl_tags = ["Development", "Import-Export", "Pipeline"]
 copyright = ["2024 bpy_jupyter Contributors"]
 
-[tool.bl_ext.permissions]
+[tool.blext.permissions]
 network = 'Jupyter needs to expose a notebook server'
 
 # Platform Support
 ## Map Valid Blender Platforms -> Required PyPi Platform Tags
 ## Include as few PyPi tags as works on ~everything.
-[tool.bl_ext.platforms]
+[tool.blext.platforms]
 windows-amd64 = ['win_amd64']
 macos-arm64 = ['macosx_11_0_arm64', 'macosx_12_0_arm64', 'macosx_14_0_arm64']
 linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64', 'manylinux_2_28_x86_64']
@@ -53,13 +53,13 @@ linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64
 
 # Packaging
 ## Path is from the directory containing this file.
-[tool.bl_ext.packaging]
+[tool.blext.packaging]
 path_wheels = 'dev/wheels'
 init_settings_filename = 'init_settings.toml'
 
 # "Profiles" -> Affects Initialization Settings
 ## This sets the default extension preferences for different situations.
-[tool.bl_ext.profiles.test]
+[tool.blext.profiles.test]
 use_path_local = true
 use_log_file = true
 log_file_path = 'bpy_jupyter.log'
@@ -67,7 +67,7 @@ log_file_level = 'DEBUG'
 use_log_console = true
 log_console_level = 'INFO'
 
-[tool.bl_ext.profiles.dev]
+[tool.blext.profiles.dev]
 use_path_local = true
 use_log_file = true
 log_file_path = 'bpy_jupyter.log'
@@ -75,7 +75,7 @@ log_file_level = 'DEBUG'
 use_log_console = true
 log_console_level = 'INFO'
 
-[tool.bl_ext.profiles.release]
+[tool.blext.profiles.release]
 use_path_local = false
 use_log_file = true
 log_file_path = 'bpy_jupyter.log'
@@ -83,7 +83,7 @@ log_file_level = 'INFO'
 use_log_console = true
 log_console_level = 'WARNING'
 
-[tool.bl_ext.profiles.release-debug]
+[tool.blext.profiles.release-debug]
 use_path_local = false
 use_log_file = true
 log_file_path = 'bpy_jupyter.log'
@@ -97,6 +97,7 @@ log_console_level = 'WARNING'
 [tool.uv]
 managed = true
 dev-dependencies = [
+    "blext>=0.2.1",
     "mypy>=1.13.0",
     "pip>=24.2",
     "rich>=13.9.3",

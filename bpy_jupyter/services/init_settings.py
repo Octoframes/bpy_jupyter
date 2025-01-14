@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pydantic as pyd
 
+from .. import __package__ as base_package
+
 ####################
 # - Constants
 ####################
@@ -30,18 +32,8 @@ StrLogLevel: typ.TypeAlias = typ.Literal[
 ]
 
 
-def str_to_loglevel(obj: typ.Any) -> LogLevel | typ.Any:
-	if isinstance(obj, str) and obj in STR_LOG_LEVEL:
-		return STR_LOG_LEVEL[obj]
-	return obj
-
-
 class InitSettings(pyd.BaseModel):
-	"""Model describing addon initialization settings, describing default settings baked into the release.
-
-	Each parameter
-
-	"""
+	"""Model describing addon initialization settings, describing default settings baked into the release."""
 
 	use_log_file: bool
 	log_file_path: Path
@@ -49,6 +41,20 @@ class InitSettings(pyd.BaseModel):
 
 	use_log_console: bool
 	log_console_level: StrLogLevel
+
+	@pyd.field_validator('log_file_path', mode='after')
+	@classmethod
+	def add_bpy_to_log_file_path(cls, value: Path, _: pyd.ValidationInfo) -> Path:
+		import bpy
+
+		addon_dir = Path(
+			bpy.utils.extension_path_user(
+				base_package,
+				path='',
+				create=True,
+			)
+		)
+		return addon_dir / value
 
 
 ####################

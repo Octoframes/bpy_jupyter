@@ -4,7 +4,6 @@ Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_n
 """
 
 import asyncio
-import typing as typ
 
 import bpy
 
@@ -38,11 +37,23 @@ class StartJupyterKernel(bpy.types.Operator):
 
 	_timer = None
 
-	def modal(self, context: bpy.types.Context, event: bpy.types.Event):
+	def modal(
+		self, context: bpy.types.Context, event: bpy.types.Event
+	) -> set[ct.BLOperatorStatus]:
 		if event.type == 'TIMER':
 			loop = asyncio.get_event_loop()
 			loop.call_soon(loop.stop)
 			loop.run_forever()
+
+		if jkern.kernel_should_stop():
+			jkern.stop_kernel()
+
+			wm = context.window_manager
+			wm.event_timer_remove(self._timer)
+
+			self._timer = None
+
+			return {'FINISHED'}
 
 		return {'PASS_THROUGH'}
 
@@ -60,11 +71,14 @@ class StartJupyterKernel(bpy.types.Operator):
 				jkern.start_kernel(ct.addon.addon_dir())
 
 			case 'MARIMO':
-				raise NotImplementedError
+				msg = 'Marimo kernel is not yet implemented.'
+				raise NotImplementedError(msg)
 
 		return {'RUNNING_MODAL'}
 
 	def cancel(self, context):
+		jkern.stop_kernel()
+
 		wm = context.window_manager
 		wm.event_timer_remove(self._timer)
 
