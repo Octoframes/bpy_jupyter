@@ -1,0 +1,30 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: forbid-crlf
+      - id: remove-crlf
+      - id: chmod
+        args: ['644']
+        files: \.md$
+      - id: insert-license
+        files: \.py$
+        args:
+          - --license-filepath
+          - LICENSE_header.txt
+          - --comment-style
+          - "#"
+          - --use-current-year
+          - --fuzzy-match-generates-todo
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.9.1
+    hooks:
+      # ruff lint
+      #- id: ruff
+        #args: [ --fix ]
+      # ruff fmt
+      - id: ruff-format
