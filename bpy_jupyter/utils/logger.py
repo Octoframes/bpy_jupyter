@@ -31,7 +31,7 @@ ERROR_CONSOLE = rich.console.Console(
 ADDON_LOGGER_NAME = f'blext-{ct.addon.NAME}'
 ADDON_LOGGER: logging.Logger = logging.getLogger(ADDON_LOGGER_NAME)
 
-rich.traceback.install(show_locals=True, console=ERROR_CONSOLE)
+#rich.traceback.install(show_locals=True, console=ERROR_CONSOLE)
 
 
 ####################

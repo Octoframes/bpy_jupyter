@@ -40,20 +40,24 @@ class StartJupyterKernel(bpy.types.Operator):
 	def modal(
 		self, context: bpy.types.Context, event: bpy.types.Event
 	) -> set[ct.BLOperatorStatus]:
-		if event.type == 'TIMER':
-			loop = asyncio.get_event_loop()
-			loop.call_soon(loop.stop)
-			loop.run_forever()
-
-		if jkern.kernel_should_stop():
-			jkern.stop_kernel()
-
+		if jkern.is_kernel_waiting_to_stop():
+			# Stop the Timer
 			wm = context.window_manager
 			wm.event_timer_remove(self._timer)
 
 			self._timer = None
 
+			# Stop the Kernel
+			jkern.stop_kernel()
+
+			# Conclude the Modal Operator
 			return {'FINISHED'}
+
+		if event.type == 'TIMER' and not jkern.is_kernel_waiting_to_stop():
+			# Flush Pending ASync Commands
+			loop = asyncio.get_event_loop()
+			loop.call_soon(loop.stop)
+			loop.run_forever()
 
 		return {'PASS_THROUGH'}
 

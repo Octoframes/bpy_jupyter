@@ -20,7 +20,7 @@ class StopJupyterKernel(bpy.types.Operator):
 
 	@classmethod
 	def poll(cls, _: bpy.types.Context) -> bool:
-		return jkern.is_kernel_running()
+		return jkern.is_kernel_running() and not jkern.is_kernel_waiting_to_stop()
 
 	def execute(self, context: bpy.types.Context) -> set[ct.BLOperatorStatus]:
 		jkern.queue_kernel_stop()
