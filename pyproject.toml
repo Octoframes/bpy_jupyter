@@ -1,7 +1,7 @@
 [project]
 name = "bpy_jupyter"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Interact with Blender using Jupyter notebooks"
 authors = [
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
     { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
@@ -11,7 +11,7 @@ maintainers = [
     { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = "~= 3.11"
 license = { text = "AGPL-3.0-or-later" }
 dependencies = [
     "rich>=13.9.3",

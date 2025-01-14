@@ -1,4 +1,4 @@
-import bpy
+import bpyUsage
 import platformdirs
 
 from .. import contracts as ct
@@ -65,7 +65,7 @@ class JupyterPanel(bpy.types.Panel):
 	## TODO: Provide an option that forces appending? So that users can modify from a baseline. Just watch out - dealing with overlaps isn't trivial.
 
 	bl_idname = ct.PanelType.JupyterPanel
-	bl_label = 'Jupyter Kernel'
+	bl_label = 'Jupyter Notebooks'
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
 	bl_context = 'scene'

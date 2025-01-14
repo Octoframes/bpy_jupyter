@@ -1,5 +1,5 @@
 version = 1
-requires-python = ">=3.11"
+requires-python = ">=3.11, <4"
 
 [[package]]
 name = "aiofiles"
@@ -267,7 +267,7 @@ wheels = [
 
 [[package]]
 name = "bpy-jupyter"
-version = "0.1.0"
+version = "0.2.0"
 source = { virtual = "." }
 dependencies = [
     { name = "anywidget" },
@@ -467,7 +467,7 @@ version = "3.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
-    { name = "docstring-parser", marker = "python_full_version < '4.0'" },
+    { name = "docstring-parser" },
     { name = "rich" },
     { name = "rich-rst" },
 ]
