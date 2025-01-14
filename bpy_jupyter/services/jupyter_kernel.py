@@ -1,10 +1,12 @@
 import asyncio
+import ipaddress
 import multiprocessing
 import os
 import subprocess
 import sys
 import threading
 import time
+import typing as typ
 from pathlib import Path
 
 from ipykernel.kernelapp import IPKernelApp
@@ -82,9 +84,20 @@ _PATH_JUPYTER_CONNECTION_FILE: Path | None = None
 ####################
 # - Actions
 ####################
-def start_kernel(addon_dir: Path) -> None:
+def start_kernel(
+	*,
+	addon_dir: Path,
+	kernel_type: typ.Literal['IPYKERNEL'],
+	notebook_dir: Path,
+	launch_browser: bool,
+	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
+	jupyter_port: int,
+) -> None:
 	"""Start the jupyter kernel in Blender, and expose it by starting the Jupyter notebook server in a subprocess."""
 	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _RUNNING  # noqa: PLW0603
+
+	if kernel_type != 'IPYKERNEL':
+		raise NotImplementedError
 
 	jupyter_py_path = find_jupyter_py()
 	with _LOCK:
@@ -106,6 +119,10 @@ def start_kernel(addon_dir: Path) -> None:
 					'-m',
 					'jupyterlab',
 					f'--app-dir={jupyter_py_path.parent / "jupyterlab"!s}',
+					f'--ip={jupyter_ip!s}',
+					f'--port={jupyter_port!s}',
+					f'--notebook-dir={notebook_dir!s}',
+					*(['--no-browser'] if not launch_browser else []),
 					'--KernelProvisionerFactory.default_provisioner_name=pyxll-provisioner',
 				],
 				bufsize=0,

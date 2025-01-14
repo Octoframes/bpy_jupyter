@@ -277,6 +277,7 @@ dependencies = [
     { name = "jupyter-client" },
     { name = "jupyter-server" },
     { name = "jupyterlab" },
+    { name = "platformdirs" },
     { name = "pydantic" },
     { name = "pyxll-jupyter" },
     { name = "rich" },
@@ -296,12 +297,13 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "anywidget", specifier = ">=0.9.13" },
-    { name = "ipykernel", specifier = "==6.*" },
+    { name = "ipykernel", specifier = "==6.29.5" },
     { name = "ipywidgets", specifier = ">=8.1.5" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "jupyter-client", specifier = ">=8.6.3" },
     { name = "jupyter-server", specifier = ">=2.14.2" },
     { name = "jupyterlab", specifier = ">=4.2.5" },
+    { name = "platformdirs", specifier = ">=4.3.6" },
     { name = "pydantic", specifier = ">=2.9.2" },
     { name = "pyxll-jupyter", specifier = ">=0.5.3" },
     { name = "rich", specifier = ">=13.9.3" },

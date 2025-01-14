@@ -4,6 +4,8 @@ Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_n
 """
 
 import asyncio
+import ipaddress
+from pathlib import Path
 
 import bpy
 
@@ -16,24 +18,6 @@ class StartJupyterKernel(bpy.types.Operator):
 
 	bl_idname = ct.OperatorType.StartJupyterKernel
 	bl_label = 'Start Jupyter Kernel'
-
-	kernel_type: bpy.props.EnumProperty(
-		name='Kernel Type',
-		description='The jupyter kernel to launch within Blender',
-		items=[
-			(
-				'IPYKERNEL',
-				'IPyKernel',
-				'A traditional, well-tested Python notebook kernel',
-			),
-			(
-				'MARIMO',
-				'Marimo',
-				'A reactive, modern Python notebook kernel',
-			),
-		],
-		default='IPYKERNEL',
-	)
 
 	_timer = None
 
@@ -66,13 +50,28 @@ class StartJupyterKernel(bpy.types.Operator):
 		return not jkern.is_kernel_running()
 
 	def execute(self, context: bpy.types.Context) -> set[ct.BLOperatorStatus]:
+		# Setup Timer
 		wm = context.window_manager
 		self._timer = wm.event_timer_add(0.016, window=context.window)
 		wm.modal_handler_add(self)
 
-		match self.kernel_type:
+		# Retrieve Scene Properties from Context
+		kernel_type = context.scene.jupyter_kernel_type
+		notebook_dir = context.scene.jupyter_notebook_dir
+		launch_browser = context.scene.jupyter_launch_browser
+		jupyter_ip = context.scene.jupyter_ip
+		jupyter_port = context.scene.jupyter_port
+
+		match kernel_type:
 			case 'IPYKERNEL':
-				jkern.start_kernel(ct.addon.addon_dir())
+				jkern.start_kernel(
+					addon_dir=ct.addon.addon_dir(),
+					kernel_type=kernel_type,
+					notebook_dir=Path(bpy.path.abspath(notebook_dir)),
+					launch_browser=launch_browser,
+					jupyter_ip=ipaddress.IPv4Address(jupyter_ip),
+					jupyter_port=jupyter_port,
+				)
 
 			case 'MARIMO':
 				msg = 'Marimo kernel is not yet implemented.'

@@ -5,3 +5,5 @@ import enum
 
 class Icon(enum.StrEnum):
 	"""Identifiers for icons used throughout this addon."""
+
+	LaunchBrowser = 'INTERNET'
