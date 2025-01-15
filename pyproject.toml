@@ -25,6 +25,7 @@ dependencies = [
     "ipykernel==6.29.5",
     "jupyter-client>=8.6.3",
     "platformdirs>=4.3.6",
+    "pyperclipfix>=1.9.4",
 ]
 
 [project.urls]

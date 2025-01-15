@@ -30,7 +30,7 @@ from ..services import jupyter_kernel as jkern
 
 
 class StartJupyterKernel(bpy.types.Operator):
-	"""Operator that starts a Jupyter kernel within Blender."""
+	"""Start a notebook kernel, and Jupyter Lab server, from within Blender."""
 
 	bl_idname = ct.OperatorType.StartJupyterKernel
 	bl_label = 'Start Jupyter Kernel'

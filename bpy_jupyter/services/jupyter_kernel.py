@@ -13,7 +13,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
+References:
+
+- IPython Kernel Options: <https://ipython.readthedocs.io/en/stable/config/options/kernel.html#configtrait-IPKernelApp.kernel_class>
+- Wrapper Kernels: <https://ipython.readthedocs.io/en/stable/development/wrapperkernels.html>
+- Jupyter Lab Connect to Existing Kernel: <https://github.com/jupyterlab/jupyterlab/issues/2044>
+- `pyxll-jupyter` Custom Kernel Provisioner: <https://github.com/pyxll/pyxll-jupyter/blob/5459a93a6cfd79d5b3f1775d19fd531c79938512/pyxll_jupyter/provisioning/existing.py>
+- `marimo-blender`: https://github.com/iplai/marimo-blender/blob/main/marimo_blender/addon_setup.py
+"""
+
+import secrets
 import asyncio
 import ipaddress
 import multiprocessing
@@ -96,6 +107,8 @@ _WAITING_TO_STOP: bool = False
 
 _PATH_JUPYTER_CONNECTION_FILE: Path | None = None
 
+_SECRET_TOKEN: str | None = None
+
 
 ####################
 # - Actions
@@ -110,7 +123,7 @@ def start_kernel(
 	jupyter_port: int,
 ) -> None:
 	"""Start the jupyter kernel in Blender, and expose it by starting the Jupyter notebook server in a subprocess."""
-	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _RUNNING  # noqa: PLW0603
+	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _RUNNING, _SECRET_TOKEN  # noqa: PLW0603
 
 	if kernel_type != 'IPYKERNEL':
 		raise NotImplementedError
@@ -129,6 +142,7 @@ def start_kernel(
 			_KERNEL.initialize([sys.executable])  # type: ignore[no-untyped-call]
 			_KERNEL.kernel.start()
 
+			_SECRET_TOKEN = secrets.token_urlsafe(32)
 			_JUPYTER = subprocess.Popen(
 				[
 					sys.executable,
@@ -138,6 +152,7 @@ def start_kernel(
 					f'--ip={jupyter_ip!s}',
 					f'--port={jupyter_port!s}',
 					f'--notebook-dir={notebook_dir!s}',
+					f'--IdentityProvider.token={_SECRET_TOKEN!s}',
 					*(['--no-browser'] if not launch_browser else []),
 					'--KernelProvisionerFactory.default_provisioner_name=pyxll-provisioner',
 				],
@@ -157,12 +172,14 @@ def start_kernel(
 
 def stop_kernel() -> None:
 	"""Stop a running the jupyter kernel in Blender, and stop a running Jupyter notebook server as well."""
-	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _WAITING_TO_STOP, _RUNNING  # noqa: PLW0603
+	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _WAITING_TO_STOP, _RUNNING, _SECRET_TOKEN  # noqa: PLW0603
 
 	# Start Kernel Shutdown
 	shutdown_kernel(_PATH_JUPYTER_CONNECTION_FILE)
 
 	with _LOCK:
+		_SECRET_TOKEN = None
+
 		# Stop the Jupyter Notebook Server
 		if _JUPYTER is not None:
 			proc = _JUPYTER
@@ -226,6 +243,41 @@ def queue_kernel_stop() -> None:
 	global _WAITING_TO_STOP  # noqa: PLW0603
 	with _LOCK:
 		_WAITING_TO_STOP = True
+
+
+####################
+# - Information
+####################
+def jupyter_api_url(
+	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
+	jupyter_port: int,
+) -> str:
+	"""The URL of the Jupyter notebook server.
+
+	Used to connect via external IDEs like VSCodium.
+	"""
+	with _LOCK:
+		if _SECRET_TOKEN is not None:
+			return f'http://{jupyter_ip!s}:{jupyter_port!s}/?token={_SECRET_TOKEN}'
+
+		msg = 'No jupyter kernel is running; cannot get token.'
+		raise ValueError(msg)
+
+
+def jupyter_lab_url(
+	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
+	jupyter_port: int,
+) -> str:
+	"""The URL of the Jupyter lab server.
+
+	Used to access the browser-based IDE.
+	"""
+	with _LOCK:
+		if _SECRET_TOKEN is not None:
+			return f'http://{jupyter_ip!s}:{jupyter_port!s}/lab?token={_SECRET_TOKEN}'
+
+		msg = 'No jupyter kernel is running; cannot get token.'
+		raise ValueError(msg)
 
 
 ####################

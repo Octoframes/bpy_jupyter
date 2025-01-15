@@ -29,7 +29,7 @@ from ..services import jupyter_kernel as jkern
 
 
 class StopJupyterKernel(bpy.types.Operator):
-	"""Operator that starts a Jupyter kernel within Blender."""
+	"""Stop a notebook kernel and Jupyter Lab server running within Blender."""
 
 	bl_idname = ct.OperatorType.StopJupyterKernel
 	bl_label = 'Stop Jupyter Kernel'

@@ -26,3 +26,4 @@ class OperatorType(enum.StrEnum):
 
 	StartJupyterKernel = f'{ADDON_NAME}.start_jupyter_kernel'
 	StopJupyterKernel = f'{ADDON_NAME}.stop_jupyter_kernel'
+	CopyJupyURLToClip = f'{ADDON_NAME}.copy_jupy_url_to_clip'

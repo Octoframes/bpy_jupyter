@@ -279,6 +279,7 @@ dependencies = [
     { name = "jupyterlab" },
     { name = "platformdirs" },
     { name = "pydantic" },
+    { name = "pyperclipfix" },
     { name = "pyxll-jupyter" },
     { name = "rich" },
 ]
@@ -305,6 +306,7 @@ requires-dist = [
     { name = "jupyterlab", specifier = ">=4.2.5" },
     { name = "platformdirs", specifier = ">=4.3.6" },
     { name = "pydantic", specifier = ">=2.9.2" },
+    { name = "pyperclipfix", specifier = ">=1.9.4" },
     { name = "pyxll-jupyter", specifier = ">=0.5.3" },
     { name = "rich", specifier = ">=13.9.3" },
 ]
@@ -1577,6 +1579,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0a/5a/cd399b1b36fa5e1fc61f6d3a39aff12345aaac8e187073a5ba01e418a515/pypdl-1.5.1.tar.gz", hash = "sha256:975c2c8b58ab94154f2afb5308ffdd5e89f3944d3d149a9f1f6ba1de412a0355", size = 23944 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ce/5e/ac68c41650d7b29f1c52e4fc0923f6a098a4070d44e340c3c570fb15005d/pypdl-1.5.1-py3-none-any.whl", hash = "sha256:e95d5ea48a56bf807b73b96ebd48e918648f7cb432dbbe8b8968f93d9ad47e76", size = 20712 },
+]
+
+[[package]]
+name = "pyperclipfix"
+version = "1.9.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/cd/f4e48c462a8b686cf24c1ff20f8ab9b0a390c4517ef520f01b1f181e79ad/pyperclipfix-1.9.4.tar.gz", hash = "sha256:a6c1bbe582190f0e141d338cd33bebf707aa782cdc5b93df140b142b52747da1", size = 21112 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/73/8a8a044b4d5ede957d7edc1f2706f0e566ea7474bf66883f798b97d5f6ce/pyperclipfix-1.9.4-py3-none-any.whl", hash = "sha256:345260636d601f291278c91728f52a87cc5eeb9f26a432d858abebac41f56dbf", size = 11181 },
 ]
 
 [[package]]
