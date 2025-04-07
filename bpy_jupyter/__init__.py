@@ -65,10 +65,6 @@ def register() -> None:
 
 	addon_prefs = ct.addon.prefs()
 	if addon_prefs is not None:
-		# Update Loggers
-		# - This updates existing loggers to use settings defined by preferences.
-		addon_prefs.on_addon_logging_changed()
-
 		log.info('Registering Addon: %s', ct.addon.NAME)
 
 		registration.register_classes(BL_REGISTER)

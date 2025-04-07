@@ -17,10 +17,9 @@ dependencies = [
     "rich>=13.9.3",
     "anywidget>=0.9.13",
     "ipywidgets>=8.1.5",
-    "jupyterlab>=4.2.5",
+    "jupyterlab>=3.5.0",
     "pydantic>=2.9.2",
     "jupyter-server>=2.14.2",
-    "pyxll-jupyter>=0.5.3",
     "jupyter>=1.1.1",
     "ipykernel==6.29.5",
     "jupyter-client>=8.6.3",
@@ -34,65 +33,55 @@ Homepage = "https://kolibril13.github.io/bpy-gallery/"
 ####################
 # - Blender Extension
 ####################
+[project.optional-dependencies]
+blender4_3 = [
+    "toml==0.10.2",
+    "autopep8==2.3.1", # # ⭳⭳⭳ MANAGED BY BLEXT ⭳⭳⭳
+    "certifi==2021.10.8",
+    "charset_normalizer==2.0.10",
+    "cython==0.29.30",
+    "idna==3.3",
+    "numpy==1.24.3",
+    "pip==24.0",
+    "pycodestyle==2.12.1",
+    "requests==2.27.1",
+    "setuptools==63.2.0",
+    "urllib3==1.26.8",
+    "zstandard==0.16.0", # # ⭱⭱⭱ MANAGED BY BLEXT ⭱⭱⭱
+]
+blender4_4 = [
+    "toml==0.10.2",
+    "autopep8==2.3.1", # # ⭳⭳⭳ MANAGED BY BLEXT ⭳⭳⭳
+    "certifi==2021.10.8",
+    "charset_normalizer==2.0.10",
+    "cython==0.29.30",
+    "idna==3.3",
+    "numpy==1.24.3",
+    "pip==24.0",
+    "pycodestyle==2.12.1",
+    "requests==2.27.1",
+    "setuptools==63.2.0",
+    "urllib3==1.26.8",
+    "zstandard==0.16.0", # # ⭱⭱⭱ MANAGED BY BLEXT ⭱⭱⭱
+]
+
 [tool.blext]
 pretty_name = "BPY Jupyter"
-blender_version_min = '4.2.0'
-blender_version_max = '4.3.10'
+blender_version_min = '4.3.0'
+blender_version_max = '4.5.0'
 bl_tags = ["Development", "Import-Export", "Pipeline"]
-copyright = ["2024 bpy_jupyter Contributors"]
+copyright = ["2025 bpy_jupyter Contributors"]
+
+supported_platforms = [
+	'windows-x64',
+	'macos-arm64',
+	'linux-x64',
+]
+#min_glibc_version = [2, 28]
+#min_macos_version = [12, 0]
 
 [tool.blext.permissions]
 network = 'Jupyter needs to expose a notebook server'
-
-# Platform Support
-## Map Valid Blender Platforms -> Required PyPi Platform Tags
-## Include as few PyPi tags as works on ~everything.
-[tool.blext.platforms]
-windows-amd64 = ['win_amd64']
-macos-arm64 = ['macosx_10_9_universal2', 'macosx_11_0_arm64', 'macosx_12_0_arm64', 'macosx_14_0_arm64', 'macosx_10_15_universal2']
-linux-x64 = ['manylinux1_x86_64', 'manylinux2014_x86_64', 'manylinux_2_17_x86_64', 'manylinux_2_28_x86_64']
-
-#macos-x86_64 = ['macosx_10_10_x86_64']  ##TODO: Broken
-
-# Packaging
-## Path is from the directory containing this file.
-[tool.blext.packaging]
-path_wheels = 'dev/wheels'
-init_settings_filename = 'init_settings.toml'
-
-# "Profiles" -> Affects Initialization Settings
-## This sets the default extension preferences for different situations.
-[tool.blext.profiles.test]
-use_path_local = true
-use_log_file = true
-log_file_path = 'bpy_jupyter.log'
-log_file_level = 'DEBUG'
-use_log_console = true
-log_console_level = 'INFO'
-
-[tool.blext.profiles.dev]
-use_path_local = true
-use_log_file = true
-log_file_path = 'bpy_jupyter.log'
-log_file_level = 'DEBUG'
-use_log_console = true
-log_console_level = 'INFO'
-
-[tool.blext.profiles.release]
-use_path_local = false
-use_log_file = true
-log_file_path = 'bpy_jupyter.log'
-log_file_level = 'INFO'
-use_log_console = true
-log_console_level = 'WARNING'
-
-[tool.blext.profiles.release-debug]
-use_path_local = false
-use_log_file = true
-log_file_path = 'bpy_jupyter.log'
-log_file_level = 'DEBUG'
-use_log_console = true
-log_console_level = 'WARNING'
 
 ####################
 # - Blender Extension
@@ -100,15 +89,18 @@ log_console_level = 'WARNING'
 [tool.uv]
 managed = true
 dev-dependencies = [
-    "blext>=0.2.1",
-    "mypy>=1.13.0",
-    "pip>=24.2",
-    "rich>=13.9.3",
-    "ruff>=0.7.1",
-    "tomli-w>=1.1.0",
-    "typer>=0.15.1",
+    "blext",
 ]
 package = false
+conflicts = [
+    [
+        {extra = "blender4_3"}, # # ⭳⭳⭳ MANAGED BY BLEXT ⭳⭳⭳
+        {extra = "blender4_4"}, # # ⭱⭱⭱ MANAGED BY BLEXT ⭱⭱⭱
+    ],
+]
+
+[tool.uv.sources]
+blext = { git = "https://codeberg.org/so-rose/blext.git" }
 
 ####################
 # - Tooling: Ruff
@@ -215,33 +207,23 @@ quote-style = "single"
 indent-style = "tab"
 docstring-code-format = false
 
+
 ####################
-# - Tooling: MyPy
+# - Tool: basedpyright
 ####################
-[tool.mypy]
-python_version = '3.11'
-python_executable="./.venv/bin/python"
+[tool.basedpyright]
+defineConstant = { DEBUG = true }
 
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_return_any = true
+#include = ["blext"]
+#strict = ["blext"]
 
-strict_optional = true
-no_implicit_optional = true
+reportMissingImports = "error"
+reportMissingTypeStubs = true
 
-disallow_subclassing_any = false
-disallow_any_generics = true
-disallow_untyped_calls = true
-disallow_incomplete_defs = true
-
-check_untyped_defs = true
-disallow_untyped_decorators = true
-
-ignore_missing_imports = true
-
-plugins = [
-#	'pydantic.mypy',
-#	'typing_protocol_intersection.mypy_plugin',
+executionEnvironments = [
+  { root = "bpy_jupyter", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages", ".venv/lib/python3.11/site-packages/bpy/4.3/scripts/modules" ] },
+  #{ root = "blext", pythonVersion = "3.11" },
+  { root = ".", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages" ] },
 ]
 
 

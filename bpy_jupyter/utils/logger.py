@@ -25,7 +25,6 @@ import rich.logging
 import rich.traceback
 
 from .. import contracts as ct
-from ..services import init_settings
 
 LogLevel: typ.TypeAlias = int
 
@@ -46,6 +45,14 @@ ERROR_CONSOLE = rich.console.Console(
 
 ADDON_LOGGER_NAME = f'blext-{ct.addon.NAME}'
 ADDON_LOGGER: logging.Logger = logging.getLogger(ADDON_LOGGER_NAME)
+
+LOG_LEVEL_MAP: dict[str, LogLevel] = {
+	'debug': logging.DEBUG,
+	'info': logging.INFO,
+	'warning': logging.WARNING,
+	'error': logging.ERROR,
+	'critical': logging.CRITICAL,
+}
 
 # rich.traceback.install(show_locals=True, console=ERROR_CONSOLE)
 
@@ -91,6 +98,7 @@ def console_handler(level: LogLevel) -> rich.logging.RichHandler:
 		console=ERROR_CONSOLE,
 		rich_tracebacks=True,
 	)
+
 	rich_handler.setFormatter(rich_formatter)
 	return rich_handler
 
@@ -131,11 +139,11 @@ def get(module_name: str) -> logging.Logger:
 	## - Once setup, the preferences may decide to re-configure all the loggers.
 	addon_prefs = ct.addon.prefs()
 	if addon_prefs is None:
-		use_log_file = init_settings.INIT_SETTINGS.use_log_file
-		log_file_path = init_settings.INIT_SETTINGS.log_file_path
-		log_file_level = init_settings.INIT_SETTINGS.log_file_level
-		use_log_console = init_settings.INIT_SETTINGS.use_log_console
-		log_console_level = init_settings.INIT_SETTINGS.log_console_level
+		use_log_file = False
+		log_file_path = None
+		log_file_level = logging.DEBUG
+		use_log_console = True
+		log_console_level = logging.DEBUG
 
 		update_logger(
 			console_handler,

@@ -39,7 +39,7 @@ class StartJupyterKernel(bpy.types.Operator):
 
 	def modal(
 		self, context: bpy.types.Context, event: bpy.types.Event
-	) -> set[ct.BLOperatorStatus]:
+	) -> ct.BLOperatorStatus:
 		if jkern.is_kernel_waiting_to_stop():
 			# Stop the Timer
 			wm = context.window_manager
@@ -65,7 +65,7 @@ class StartJupyterKernel(bpy.types.Operator):
 	def poll(cls, context: bpy.types.Context) -> bool:
 		return not jkern.is_kernel_running()
 
-	def execute(self, context: bpy.types.Context) -> set[ct.BLOperatorStatus]:
+	def execute(self, context: bpy.types.Context) -> ct.BLOperatorStatus:
 		# Setup Timer
 		wm = context.window_manager
 		self._timer = wm.event_timer_add(0.016, window=context.window)

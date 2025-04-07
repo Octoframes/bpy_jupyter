@@ -33,11 +33,6 @@ bpy.types.Scene.jupyter_kernel_type = bpy.props.EnumProperty(
 			'IPyKernel',
 			'IPyKernel is the standard Python notebook kernel',
 		),
-		# (
-		# 'MARIMO',
-		# 'Marimo',
-		# 'A reactive, modern Python notebook kernel',
-		# ),
 	],
 	default='IPYKERNEL',
 )

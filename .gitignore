@@ -1,5 +1,7 @@
+.blext_cache
+
 # Byte-compiled / optimized / DLL files
-dev
+.dev
 __pycache__/
 *.py[cod]
 *$py.class

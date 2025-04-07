@@ -13,10 +13,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+"""The good stuff.
 
 References:
-
 - IPython Kernel Options: <https://ipython.readthedocs.io/en/stable/config/options/kernel.html#configtrait-IPKernelApp.kernel_class>
 - Wrapper Kernels: <https://ipython.readthedocs.io/en/stable/development/wrapperkernels.html>
 - Jupyter Lab Connect to Existing Kernel: <https://github.com/jupyterlab/jupyterlab/issues/2044>
@@ -24,11 +23,11 @@ References:
 - `marimo-blender`: https://github.com/iplai/marimo-blender/blob/main/marimo_blender/addon_setup.py
 """
 
-import secrets
 import asyncio
 import ipaddress
 import multiprocessing
 import os
+import secrets
 import subprocess
 import sys
 import threading
@@ -141,6 +140,7 @@ def start_kernel(
 			)
 			_KERNEL.initialize([sys.executable])  # type: ignore[no-untyped-call]
 			_KERNEL.kernel.start()
+			# psutil
 
 			_SECRET_TOKEN = secrets.token_urlsafe(32)
 			_JUPYTER = subprocess.Popen(
@@ -217,7 +217,7 @@ def stop_kernel() -> None:
 			## - Again, not part of close().
 			ipkernelapp.cleanup_connection_file()  # type: ignore[no-untyped-call]
 
-			# Why would they make it like this? Why must we be made to suffer?
+			# Why must we be made to suffer?
 			pass  # noqa: PIE790
 
 			# Clear Singleton Instances
