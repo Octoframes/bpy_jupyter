@@ -12,7 +12,7 @@ maintainers = [
 ]
 readme = "README.md"
 requires-python = "~= 3.11"
-license = { text = "AGPL-3.0-or-later" }
+license = "AGPL-3.0-or-later"
 dependencies = [
     "rich>=13.9.3",
     "anywidget>=0.9.13",
