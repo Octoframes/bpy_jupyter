@@ -23,7 +23,7 @@ import bpy
 import pyperclipfix
 
 from ..services import jupyter_kernel
-from ..types__hello import BLOperatorStatus, OperatorType
+from ..types import BLOperatorStatus, OperatorType
 
 
 ####################

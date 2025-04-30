@@ -92,6 +92,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bpy"
+version = "4.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cython" },
+    { name = "numpy" },
+    { name = "requests" },
+    { name = "zstandard" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/9a/3602426e41e1c912e0557774a69ec4cddca5a2251687db265a2817c9a62b/bpy-4.4.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:3b8736699a6ea06fed33d2e3042cdd5555409d0b51e2b7274f38be3f9bf774f4", size = 217733774, upload_time = "2025-03-18T11:13:31.147Z" },
+    { url = "https://files.pythonhosted.org/packages/0f/5e/7f64271fb211d02859917c786b0273964570b9242b497f29913955eeca72/bpy-4.4.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:9609454d84fd4d668adc82f839d14817f56a14179dd0ddf02ac24580be5ca77b", size = 231678638, upload_time = "2025-03-18T11:14:25.761Z" },
+    { url = "https://files.pythonhosted.org/packages/99/ef/28b7850065934fa9797f612cd52f13b9fd74574907bb886882fb18e13065/bpy-4.4.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:50ee92155cdb8740214fa3b29d9a45ee90cda9dc15eb978860916de468b8580f", size = 368892624, upload_time = "2025-03-18T11:14:01.688Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/b1/bb03b0c4f78c13f30e871d5f1d68cf27c85096aef3cb2de1e061bd8766bd/bpy-4.4.0-cp311-cp311-win_amd64.whl", hash = "sha256:6281ddd11ebe6008db143f422d7dd709c520f3f3574814dd37dda6d9cd85a1ae", size = 324938053, upload_time = "2025-03-18T11:12:51.963Z" },
+    { url = "https://files.pythonhosted.org/packages/40/9b/a9acaf9ec0a88a065bd92328c35ff7ba17af93bc7b2611ad01ee26bdcfa8/bpy-4.4.0-cp311-cp311-win_arm64.whl", hash = "sha256:5658b7f9e13dc90a64419038a52585a581fc9ab53ec909bf5199946226f4b0c0", size = 189065128, upload_time = "2025-03-18T11:13:10.219Z" },
+]
+
+[[package]]
 name = "bpy-jupyter"
 version = "0.2.0"
 source = { virtual = "." }
@@ -114,7 +132,6 @@ blender4-3 = [
     { name = "pycodestyle" },
     { name = "requests" },
     { name = "setuptools" },
-    { name = "toml" },
     { name = "urllib3" },
     { name = "zstandard" },
 ]
@@ -129,7 +146,6 @@ blender4-4 = [
     { name = "pycodestyle" },
     { name = "requests" },
     { name = "setuptools" },
-    { name = "toml" },
     { name = "urllib3" },
     { name = "zstandard" },
 ]
@@ -137,6 +153,7 @@ blender4-4 = [
 [package.dev-dependencies]
 dev = [
     { name = "blext" },
+    { name = "bpy" },
 ]
 
 [package.metadata]
@@ -165,8 +182,6 @@ requires-dist = [
     { name = "requests", marker = "extra == 'blender4-4'", specifier = "==2.27.1" },
     { name = "setuptools", marker = "extra == 'blender4-3'", specifier = "==63.2.0" },
     { name = "setuptools", marker = "extra == 'blender4-4'", specifier = "==63.2.0" },
-    { name = "toml", marker = "extra == 'blender4-3'", specifier = "==0.10.2" },
-    { name = "toml", marker = "extra == 'blender4-4'", specifier = "==0.10.2" },
     { name = "urllib3", marker = "extra == 'blender4-3'", specifier = "==1.26.8" },
     { name = "urllib3", marker = "extra == 'blender4-4'", specifier = "==1.26.8" },
     { name = "zstandard", marker = "extra == 'blender4-3'", specifier = "==0.16.0" },
@@ -175,7 +190,10 @@ requires-dist = [
 provides-extras = ["blender4-3", "blender4-4"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "blext", git = "https://codeberg.org/so-rose/blext.git" }]
+dev = [
+    { name = "blext", git = "https://codeberg.org/so-rose/blext.git" },
+    { name = "bpy", specifier = ">=4.4.0" },
+]
 
 [[package]]
 name = "certifi"
@@ -1052,15 +1070,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/28/e3/55dcc2cfbc3ca9c29519eb6884dd1415ecb53b0e934862d3559ddcb7e20b/stack_data-0.6.3.tar.gz", hash = "sha256:836a778de4fec4dcd1dcd89ed8abff8a221f58308462e1c4aa2a3cf30148f0b9", size = 44707, upload_time = "2023-09-30T13:58:05.479Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/7b/ce1eafaf1a76852e2ec9b22edecf1daa58175c090266e9f6c64afcd81d91/stack_data-0.6.3-py3-none-any.whl", hash = "sha256:d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695", size = 24521, upload_time = "2023-09-30T13:58:03.53Z" },
-]
-
-[[package]]
-name = "toml"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload_time = "2020-11-01T01:40:22.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload_time = "2020-11-01T01:40:20.672Z" },
 ]
 
 [[package]]

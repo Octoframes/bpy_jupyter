@@ -26,8 +26,6 @@ Attributes:
 	_REGISTERED_HANDLERS: Addon handlers currently registered by this addon.
 """
 
-import typing as typ
-
 import bpy
 
 from .types import BLClass
