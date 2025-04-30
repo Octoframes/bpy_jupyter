@@ -39,6 +39,4 @@ class BPYJupyterAddonPrefs(bpy.types.AddonPreferences):
 ####################
 # - Blender Registration
 ####################
-BL_REGISTER = [
-	BPYJupyterAddonPrefs,
-]
+BL_REGISTER = [BPYJupyterAddonPrefs]

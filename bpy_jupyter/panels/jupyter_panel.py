@@ -17,26 +17,12 @@
 import bpy
 import platformdirs
 
-from .. import contracts as ct
-from ..services import jupyter_kernel as jkern
+from ..services import jupyter_kernel
+from ..types import Icon, OperatorType, PanelType
 
 ####################
 # - Scene Properties
 ####################
-# Kernel
-bpy.types.Scene.jupyter_kernel_type = bpy.props.EnumProperty(
-	name='Kernel Type',
-	description='The jupyter kernel to launch within Blender',
-	items=[
-		(
-			'IPYKERNEL',
-			'IPyKernel',
-			'IPyKernel is the standard Python notebook kernel',
-		),
-	],
-	default='IPYKERNEL',
-)
-
 # Behavior
 bpy.types.Scene.jupyter_notebook_dir = bpy.props.StringProperty(
 	name='Notebook Root Folder',
@@ -75,7 +61,7 @@ class JupyterPanel(bpy.types.Panel):
 
 	## TODO: Provide an option that forces appending? So that users can modify from a baseline. Just watch out - dealing with overlaps isn't trivial.
 
-	bl_idname = ct.PanelType.JupyterPanel
+	bl_idname = PanelType.JupyterPanel
 	bl_label = 'Jupyter Notebooks'
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
@@ -111,21 +97,21 @@ class JupyterPanel(bpy.types.Panel):
 		####################
 		# Operator: Start Kernel
 		row = layout.row(align=True)
-		row.enabled = not jkern.is_kernel_running()
+		row.enabled = not jupyter_kernel.is_kernel_running()
 		split = row.split(factor=0.85, align=True)
 		split.alignment = 'RIGHT'
-		split.operator(ct.OperatorType.StartJupyterKernel)
+		split.operator(OperatorType.StartJupyterKernel)
 		split.prop(
 			context.scene,
 			'jupyter_launch_browser',
-			icon=ct.Icon.LaunchBrowser,
+			icon=Icon.LaunchBrowser,
 			toggle=True,
 			icon_only=True,
 		)
 
 		# Operator: Stop Kernel
 		row = layout.row(align=True)
-		row.operator(ct.OperatorType.StopJupyterKernel)
+		row.operator(OperatorType.StopJupyterKernel)
 
 		####################
 		# - Section: Basic Options
@@ -136,19 +122,11 @@ class JupyterPanel(bpy.types.Panel):
 		)
 		header.label(text='Basic Options')
 		if body is not None:
-			# Kernel Panel
 			row = body.row(align=True)
-			row.enabled = not jkern.is_kernel_running()
+			row.enabled = not jupyter_kernel.is_kernel_running()
 			split = row.split(factor=split_fac, align=True)
 			split.alignment = 'RIGHT'
-			split.label(text='Kernel')
-			split.prop(context.scene, 'jupyter_kernel_type', text='')
-
-			row = body.row(align=True)
-			row.enabled = not jkern.is_kernel_running()
-			split = row.split(factor=split_fac, align=True)
-			split.alignment = 'RIGHT'
-			split.label(text='Root Dir')
+			split.label(text='Notebook Dir')
 			split.prop(context.scene, 'jupyter_notebook_dir', text='')
 
 		####################
@@ -161,14 +139,14 @@ class JupyterPanel(bpy.types.Panel):
 		header.label(text='Network Options')
 		if body is not None:
 			body_row = body.row(align=True)
-			body_row.enabled = not jkern.is_kernel_running()
+			body_row.enabled = not jupyter_kernel.is_kernel_running()
 			body_split = body_row.split(factor=split_fac, align=True)
 			body_split.alignment = 'RIGHT'
 			body_split.label(text='IPv4')
 			body_split.prop(context.scene, 'jupyter_ip', text='')
 
 			body_row = body.row(align=True)
-			body_row.enabled = not jkern.is_kernel_running()
+			body_row.enabled = not jupyter_kernel.is_kernel_running()
 			body_split = body_row.split(factor=split_fac, align=True)
 			body_split.alignment = 'RIGHT'
 			body_split.label(text='Port')
@@ -191,10 +169,10 @@ class JupyterPanel(bpy.types.Panel):
 			# Operators
 			row = body.row(align=False)
 
-			op = row.operator(ct.OperatorType.CopyJupyURLToClip, text='Lab URL')
+			op = row.operator(OperatorType.CopyJupyURLToClip, text='Lab URL')
 			op.url_type = 'LAB'
 
-			op = row.operator(ct.OperatorType.CopyJupyURLToClip, text='API URL')
+			op = row.operator(OperatorType.CopyJupyURLToClip, text='API URL')
 			op.url_type = 'API'
 
 
@@ -202,5 +180,3 @@ class JupyterPanel(bpy.types.Panel):
 # - Blender Registration
 ####################
 BL_REGISTER = [JupyterPanel]
-BL_HANDLERS: ct.BLHandlers = ct.BLHandlers()
-BL_KEYMAP_ITEMS: list[ct.BLKeymapItem] = []

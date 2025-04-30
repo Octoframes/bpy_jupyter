@@ -19,27 +19,35 @@
 Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_notebook/kernel.py>
 """
 
-import asyncio
-import typing as typ
-
 import bpy
 
-from .. import contracts as ct
-from ..services import jupyter_kernel as jkern
+from ..services import async_event_loop, jupyter_kernel
+from ..types import BLOperatorStatus, OperatorType
 
 
 class StopJupyterKernel(bpy.types.Operator):
 	"""Stop a notebook kernel and Jupyter Lab server running within Blender."""
 
-	bl_idname = ct.OperatorType.StopJupyterKernel
+	bl_idname = OperatorType.StopJupyterKernel
 	bl_label = 'Stop Jupyter Kernel'
 
 	@classmethod
 	def poll(cls, _: bpy.types.Context) -> bool:
-		return jkern.is_kernel_running() and not jkern.is_kernel_waiting_to_stop()
+		return jupyter_kernel.is_kernel_running()
 
-	def execute(self, context: bpy.types.Context) -> set[ct.BLOperatorStatus]:
-		jkern.queue_kernel_stop()
+	def execute(self, _: bpy.types.Context) -> BLOperatorStatus:
+		"""Stop a running `IPyKernel` and (optionally) `JupyterLabServer`."""
+		# Stop Jupyter Server
+		##if jupyter_kernel.JUPYTER_LAB_SERVER is not None:
+		##	jupyter_kernel.JUPYTER_LAB_SERVER.stop()
+
+		# Stop Jupyter Kernel
+		if jupyter_kernel.IPYKERNEL is not None:
+			jupyter_kernel.IPYKERNEL.stop()
+
+		# Stop Event Loop
+		async_event_loop.stop()
+
 		return {'FINISHED'}
 
 
@@ -47,5 +55,3 @@ class StopJupyterKernel(bpy.types.Operator):
 # - Blender Registration
 ####################
 BL_REGISTER = [StopJupyterKernel]
-BL_HANDLERS: ct.BLHandlers = ct.BLHandlers()
-BL_KEYMAP_ITEMS: list[ct.BLKeymapItem] = []

@@ -24,6 +24,8 @@ References:
 """
 
 import asyncio
+import contextlib
+import functools
 import ipaddress
 import multiprocessing
 import os
@@ -35,24 +37,22 @@ import time
 import typing as typ
 from pathlib import Path
 
+import pydantic as pyd
 from ipykernel.kernelapp import IPKernelApp
 from jupyter_client.blocking.client import BlockingKernelClient
 
-from ..utils import logger
-
-log = logger.get(__name__)
-
 
 ####################
-# - Utilities
+# - Funcs: Utility
 ####################
-def find_jupyter_py() -> Path:
+@functools.cache
+def detect_jupyter_py() -> Path:
 	import jupyter
 
 	return Path(jupyter.__spec__.origin).resolve()
 
 
-def _shutdown_kernel(path_connection_file: Path) -> None:
+def ask_remote_kernel_to_shutdown(path_connection_file: Path) -> None:
 	# Create a kernel manager
 	kc = BlockingKernelClient(connection_file=str(path_connection_file))
 	kc.load_connection_file()
@@ -70,224 +70,268 @@ def _shutdown_kernel(path_connection_file: Path) -> None:
 		raise RuntimeError(msg)
 
 
-def shutdown_kernel(path_connection_file: Path) -> None:
-	"""Uses a seperate process to queue a kernel shutdown command via. `jupyter_client`."""
-	# Queue the Shutdown Command
-	p = multiprocessing.Process(target=_shutdown_kernel, args=(path_connection_file,))
-	p.start()
+####################
+# - Class: IPyKernel
+####################
+class IPyKernel(pyd.BaseModel):
+	path_connection_file: Path
 
-	# Process the Shutdown Request
-	for _ in range(1_000):
-		if not p.is_alive():
-			break
+	####################
+	# - Internal State
+	####################
+	_lock: threading.Lock = pyd.PrivateAttr(default_factory=lambda: threading.Lock())
+	_kernel_app: IPKernelApp | None = pyd.PrivateAttr(default=None)
 
-		loop = asyncio.get_event_loop()
-		loop.call_soon(loop.stop)
-		loop.run_forever()
+	_is_running: bool = pyd.PrivateAttr(default=False)
 
-		time.sleep(0.02)
-	else:
-		msg = 'Kernel did not shutdown in time.'
-		raise RuntimeError(msg)
+	####################
+	# - Properties: Locked
+	####################
+	@functools.cached_property
+	def is_running(self) -> bool:
+		with self._lock:
+			return self._is_running
 
-	p.join()
+	####################
+	# - Methods: Lifecycle
+	####################
+	def start(self) -> None:
+		with self._lock:
+			if not self._is_running and self._kernel_app is None:
+				self._kernel_app = IPKernelApp.instance(
+					connection_file=str(self.path_connection_file)
+				)
+
+				self._kernel_app.initialize([sys.executable])
+				self._kernel_app.kernel.start()
+
+				self._is_running = True
+				with contextlib.suppress(AttributeError):
+					del self.is_running
+
+			elif not self._is_running and self._kernel_app is not None:
+				msg = 'IPyKernel is not running, but has a kernel. This is a bug.'
+				raise RuntimeError(msg)
+			else:
+				msg = "IPyKernel cannot be started, since it's already running."
+				raise ValueError(msg)
+
+	def stop(self) -> None:
+		"""Uses a seperate process to queue a kernel shutdown command via. `jupyter_client`."""
+		with self._lock:
+			if self._is_running and self._kernel_app is not None:
+				self._is_running = False
+				with contextlib.suppress(AttributeError):
+					del self.is_running
+
+				####################
+				# - Ask Kernel to Shutdown
+				####################
+				p = multiprocessing.Process(
+					target=ask_remote_kernel_to_shutdown,
+					args=(self.path_connection_file,),
+				)
+				p.start()
+
+				# Process the Shutdown Request
+				for _ in range(1_000):
+					if not p.is_alive():
+						break
+
+					loop = asyncio.get_event_loop()
+					loop.call_soon(loop.stop)
+					loop.run_forever()
+
+					time.sleep(0.02)
+				else:
+					msg = 'Kernel did not shutdown in time.'
+					raise RuntimeError(msg)
+
+				p.join()
+
+				####################
+				# - Manually Close Kernel Resources
+				####################
+				# Manually Close Kernel ZMQStreams
+				## - IPKernelApp.close() doesn't close the kernel streams.
+				## - Until the GC decides to, file-descriptors will remain open.
+				## - Therefore, we can manually close() them
+				## - See <https://github.com/ipython/ipykernel/blob/b1283b14419969e36329c1ae957509690126b057/ipykernel/kernelapp.py#L547>
+				## - See also <https://github.com/zeromq/pyzmq/blob/01bd01c77277f16f714807a3ae4769f5b726710a/zmq/eventloop/zmqstream.py#L508>
+				self._kernel_app.kernel.shell_stream.close()
+				self._kernel_app.kernel.control_stream.close()
+				self._kernel_app.kernel.debugpy_stream.close()
+
+				# Close I/O and Sockets
+				## - Implicitly calls reset_io(), restoring stdout and stderr.
+				## - Because yes, IPKernelApp also replaced sys.std*.
+				## - Also closes IPKernelApp sockets.
+				self._kernel_app.close()  # type: ignore[no-untyped-call]
+
+				# Cleanup Kernel Connection File
+				## - Again, not part of close().
+				self._kernel_app.cleanup_connection_file()  # type: ignore[no-untyped-call]
+
+				# Why must we be made to suffer?
+				pass  # noqa: PIE790
+
+				# Clear Singleton Instances
+				## - Else, IPKernelApp will "magically" revive the same object.
+				## - IPKernelApp.Kernel is also a singleton, so it's cleared too.
+				## - For good measure, force an immediate GC of what's left
+				self._kernel_app.kernel.clear_instance()
+				self._kernel_app.clear_instance()
+
+				# Clear Singleton Instances
+				_kernel = self._kernel_app
+				self._kernel_app = None
+				del _kernel  ## TODO: Check refcount to make sure it's really 1? And/or force a gc here?
+
+				## TODO: Check refcount?
+				## TODO: Force GC?
+
+			elif self._is_running and self._kernel_app is None:
+				msg = 'IPyKernel is running, but has no kernel. This is a bug.'
+				raise RuntimeError(msg)
+			else:
+				msg = "IPyKernel cannot be stopped, since it's not running."
+				raise ValueError(msg)
+
+
+####################
+# - Class: JupyterLabServer
+####################
+class JupyterLabServer(pyd.BaseModel):
+	path_notebooks: Path
+	path_connection_file: Path
+
+	ip: ipaddress.IPv4Address | ipaddress.IPv6Address = ipaddress.IPv4Address(
+		'127.0.0.1'
+	)
+	port: int = 8998
+	token: pyd.SecretStr = pyd.Field(
+		default_factory=lambda: pyd.SecretStr(secrets.token_urlsafe(32))
+	)
+
+	####################
+	# - Internal State
+	###################
+	_lock: threading.Lock = pyd.PrivateAttr(default_factory=lambda: threading.Lock())
+	_process: subprocess.Popen[typ.Any] | None = pyd.PrivateAttr(default=None)
+
+	_is_running: bool = pyd.PrivateAttr(default=False)
+
+	####################
+	# - Properties: Locked
+	####################
+	@functools.cached_property
+	def is_running(self) -> bool:
+		with self._lock:
+			return self._is_running
+
+	@property
+	def lab_url(self) -> str:
+		return f'http://{self.ip!s}:{self.port!s}/lab?token={self.token.get_secret_value()!s}'
+
+	####################
+	# - Methods: Lifecycle
+	####################
+	def start(self, *, launch_browser: bool = False) -> None:
+		jupyter_py = detect_jupyter_py()
+
+		with self._lock:
+			if not self._is_running and self._process is None:
+				self._process = subprocess.Popen(
+					[
+						sys.executable,
+						'-m',
+						'jupyterlab',
+						f'--app-dir={jupyter_py.parent / "jupyterlab"!s}',
+						f'--ip={self.ip!s}',
+						f'--port={self.port!s}',
+						f'--notebook-dir={self.path_notebooks!s}',
+						f'--IdentityProvider.token={self.token.get_secret_value()!s}',
+						'--ServerApp.allow_external_kernels=True',
+						f'--ServerApp.external_connection_dir={self.path_connection_file.parent!s}',
+						*(['--no-browser'] if not launch_browser else []),
+					],
+					env=os.environ
+					| {
+						'PYTHONPATH': str(jupyter_py.parent),
+					},
+				)
+
+				self._is_running = True
+				with contextlib.suppress(AttributeError):
+					del self.is_running
+
+			elif not self._is_running and self._process is not None:
+				msg = (
+					'JupyterLabServer is not running, but has a process. This is a bug.'
+				)
+				raise RuntimeError(msg)
+			else:
+				msg = "JupyterLabServer cannot be started, since it's already running."
+				raise ValueError(msg)
+
+	def stop(self) -> None:
+		with self._lock:
+			if self._is_running and self._process is not None:
+				self._is_running = False
+				with contextlib.suppress(AttributeError):
+					del self.is_running
+
+				self._process.kill()
+				_ = self._process.wait()
+
+				_process = self._process
+				self._process = None
+				del _process
+
+				## TODO: Check refcount?
+				## TODO: Force GC?
+
+			elif self._is_running and self._process is None:
+				msg = 'JupyterLabServer is running, but has no kernel. This is a bug.'
+				raise RuntimeError(msg)
+			else:
+				msg = "JupyterLabServer cannot be stopped, since it's not running."
+				raise ValueError(msg)
 
 
 ####################
 # - Globals
 ####################
-_LOCK: threading.Lock = threading.Lock()
-
-_KERNEL: IPKernelApp | None = None
-_JUPYTER: subprocess.Popen | None = None
-
-_RUNNING: bool = False
-_WAITING_TO_STOP: bool = False
-
-_PATH_JUPYTER_CONNECTION_FILE: Path | None = None
-
-_SECRET_TOKEN: str | None = None
+IPYKERNEL: IPyKernel | None = None
+JUPYTER_LAB_SERVER: JupyterLabServer | None = None
 
 
-####################
-# - Actions
-####################
-def start_kernel(
+def init(
 	*,
-	addon_dir: Path,
-	kernel_type: typ.Literal['IPYKERNEL'],
-	notebook_dir: Path,
-	launch_browser: bool,
+	path_connection_file: Path,
+	path_notebooks: Path,
 	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
 	jupyter_port: int,
 ) -> None:
-	"""Start the jupyter kernel in Blender, and expose it by starting the Jupyter notebook server in a subprocess."""
-	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _RUNNING, _SECRET_TOKEN  # noqa: PLW0603
+	global IPYKERNEL, JUPYTER_LAB_SERVER
 
-	if kernel_type != 'IPYKERNEL':
-		raise NotImplementedError
+	if IPYKERNEL is None or not IPYKERNEL.is_running:
+		IPYKERNEL = IPyKernel(path_connection_file=path_connection_file)
+	elif IPYKERNEL.is_running:
+		msg = "Can't re-initialize `BPY_KERNEL`, since it is running."
+		raise ValueError(msg)
 
-	jupyter_py_path = find_jupyter_py()
-	with _LOCK:
-		_PATH_JUPYTER_CONNECTION_FILE = (
-			addon_dir
-			/ '.jupyter_connection_cache'
-			/ 'bpy-jupyter-kernel-connection.json'
+	if JUPYTER_LAB_SERVER is None or not JUPYTER_LAB_SERVER.is_running:
+		JUPYTER_LAB_SERVER = JupyterLabServer(
+			path_notebooks=path_notebooks,
+			path_connection_file=path_connection_file,
+			ip=jupyter_ip,
+			port=jupyter_port,
 		)
-		if _KERNEL is None:
-			_KERNEL = IPKernelApp.instance(
-				connection_file=str(_PATH_JUPYTER_CONNECTION_FILE),
-			)
-			_KERNEL.initialize([sys.executable])  # type: ignore[no-untyped-call]
-			_KERNEL.kernel.start()
-			# psutil
-
-			_SECRET_TOKEN = secrets.token_urlsafe(32)
-			_JUPYTER = subprocess.Popen(
-				[
-					sys.executable,
-					'-m',
-					'jupyterlab',
-					f'--app-dir={jupyter_py_path.parent / "jupyterlab"!s}',
-					f'--ip={jupyter_ip!s}',
-					f'--port={jupyter_port!s}',
-					f'--notebook-dir={notebook_dir!s}',
-					f'--IdentityProvider.token={_SECRET_TOKEN!s}',
-					*(['--no-browser'] if not launch_browser else []),
-					'--KernelProvisionerFactory.default_provisioner_name=pyxll-provisioner',
-				],
-				bufsize=0,
-				env=os.environ
-				| {
-					'PYXLL_IPYTHON_CONNECTION_FILE': str(_PATH_JUPYTER_CONNECTION_FILE),
-					'PYTHONPATH': str(jupyter_py_path.parent),
-				},
-			)
-		else:
-			msg = f'A kernel is already declared: {_KERNEL!s}'
-			raise ValueError(msg)
-
-		_RUNNING = True
-
-
-def stop_kernel() -> None:
-	"""Stop a running the jupyter kernel in Blender, and stop a running Jupyter notebook server as well."""
-	global _JUPYTER, _KERNEL, _PATH_JUPYTER_CONNECTION_FILE, _WAITING_TO_STOP, _RUNNING, _SECRET_TOKEN  # noqa: PLW0603
-
-	# Start Kernel Shutdown
-	shutdown_kernel(_PATH_JUPYTER_CONNECTION_FILE)
-
-	with _LOCK:
-		_SECRET_TOKEN = None
-
-		# Stop the Jupyter Notebook Server
-		if _JUPYTER is not None:
-			proc = _JUPYTER
-			_JUPYTER = None
-
-			proc.kill()
-			proc.wait()
-			del proc
-		else:
-			msg = 'No jupyter notebook server is running; cannot stop it'
-			raise ValueError(msg)
-
-		# Stop the Notebook Kernel
-		if _KERNEL is not None:
-			ipkernelapp = _KERNEL
-			_KERNEL = None
-
-			# Manually Close Kernel ZMQStreams
-			## - IPKernelApp.close() doesn't close the kernel streams.
-			## - Until the GC decides to, file-descriptors will remain open.
-			## - Therefore, we can manually close() them
-			## - See <https://github.com/ipython/ipykernel/blob/b1283b14419969e36329c1ae957509690126b057/ipykernel/kernelapp.py#L547>
-			## - See also <https://github.com/zeromq/pyzmq/blob/01bd01c77277f16f714807a3ae4769f5b726710a/zmq/eventloop/zmqstream.py#L508>
-			ipkernelapp.kernel.shell_stream.close()
-			ipkernelapp.kernel.control_stream.close()
-			ipkernelapp.kernel.debugpy_stream.close()
-
-			# Close I/O and Sockets
-			## - Implicitly calls reset_io(), restoring stdout and stderr.
-			## - Because yes, IPKernelApp also replaced sys.std*.
-			## - Also closes IPKernelApp sockets.
-			ipkernelapp.close()  # type: ignore[no-untyped-call]
-
-			# Cleanup Kernel Connection File
-			## - Again, not part of close().
-			ipkernelapp.cleanup_connection_file()  # type: ignore[no-untyped-call]
-
-			# Why must we be made to suffer?
-			pass  # noqa: PIE790
-
-			# Clear Singleton Instances
-			## - Else, IPKernelApp will "magically" revive the same object.
-			## - IPKernelApp.Kernel is also a singleton, so it's cleared too.
-			## - For good measure, force an immediate GC of what's left
-			ipkernelapp.kernel.clear_instance()
-			ipkernelapp.clear_instance()
-			del ipkernelapp
-
-			_PATH_JUPYTER_CONNECTION_FILE = None
-		else:
-			msg = 'No jupyter kernel is running; cannot stop it'
-			raise ValueError(msg)
-
-		# Pass Results
-		_WAITING_TO_STOP = False
-		_RUNNING = False
-
-
-def queue_kernel_stop() -> None:
-	"""Check whether a kernel is running with low overhead."""
-	global _WAITING_TO_STOP  # noqa: PLW0603
-	with _LOCK:
-		_WAITING_TO_STOP = True
-
-
-####################
-# - Information
-####################
-def jupyter_api_url(
-	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
-	jupyter_port: int,
-) -> str:
-	"""The URL of the Jupyter notebook server.
-
-	Used to connect via external IDEs like VSCodium.
-	"""
-	with _LOCK:
-		if _SECRET_TOKEN is not None:
-			return f'http://{jupyter_ip!s}:{jupyter_port!s}/?token={_SECRET_TOKEN}'
-
-		msg = 'No jupyter kernel is running; cannot get token.'
+	elif JUPYTER_LAB_SERVER.is_running:
+		msg = "Can't re-initialize `JUPYTER_LAB_SERVER`, since it is running."
 		raise ValueError(msg)
 
 
-def jupyter_lab_url(
-	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
-	jupyter_port: int,
-) -> str:
-	"""The URL of the Jupyter lab server.
-
-	Used to access the browser-based IDE.
-	"""
-	with _LOCK:
-		if _SECRET_TOKEN is not None:
-			return f'http://{jupyter_ip!s}:{jupyter_port!s}/lab?token={_SECRET_TOKEN}'
-
-		msg = 'No jupyter kernel is running; cannot get token.'
-		raise ValueError(msg)
-
-
-####################
-# - Status
-####################
 def is_kernel_running() -> bool:
-	"""Check whether a kernel is running with low overhead."""
-	return _RUNNING
-
-
-def is_kernel_waiting_to_stop() -> bool:
-	"""Whether a running kernel is waiting to stop."""
-	return _WAITING_TO_STOP
+	return IPYKERNEL is not None and IPYKERNEL.is_running

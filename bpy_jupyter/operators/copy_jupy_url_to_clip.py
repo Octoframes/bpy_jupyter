@@ -26,8 +26,8 @@ import secrets
 import bpy
 import pyperclipfix
 
-from .. import contracts as ct
 from ..services import jupyter_kernel as jkern
+from ..types import BLOperatorStatus, OperatorType
 
 ####################
 # - Constants
@@ -41,7 +41,7 @@ CLIPBOARD_CLEAR_DELAY = 45
 class CopyJupyURLToClip(bpy.types.Operator):
 	"""Copy a Jupyter Server URL to the system clipboard. The system clipboard will be cleared after a timeout, unless otherwise altered."""
 
-	bl_idname = ct.OperatorType.CopyJupyURLToClip
+	bl_idname = OperatorType.CopyJupyURLToClip
 	bl_label = 'Copy Jupyter Server URL'
 
 	_timer = None
@@ -84,7 +84,7 @@ class CopyJupyURLToClip(bpy.types.Operator):
 
 	def modal(
 		self, context: bpy.types.Context, event: bpy.types.Event
-	) -> set[ct.BLOperatorStatus]:
+	) -> BLOperatorStatus:
 		if (
 			event.type == 'TIMER'
 			and (datetime.datetime.now() - self._start_time).seconds
@@ -116,7 +116,7 @@ class CopyJupyURLToClip(bpy.types.Operator):
 			return {'FINISHED'}
 		return {'PASS_THROUGH'}
 
-	def execute(self, context: bpy.types.Context) -> set[ct.BLOperatorStatus]:
+	def execute(self, _: bpy.types.Context) -> BLOperatorStatus:
 		# Setup Timer
 		wm = context.window_manager
 		self._timer = wm.event_timer_add(CLIPBOARD_CLEAR_DELAY, window=context.window)
@@ -138,18 +138,15 @@ class CopyJupyURLToClip(bpy.types.Operator):
 
 		return {'RUNNING_MODAL'}
 
-	def cancel(self, context):
-		jkern.stop_kernel()
-
+	def cancel(self, _: bpy.types.Context) -> None:
+		# Stop the Timer
 		wm = context.window_manager
 		wm.event_timer_remove(self._timer)
-
 		self._timer = None
+		self.start_time = None
 
 
 ####################
 # - Blender Registration
 ####################
 BL_REGISTER = [CopyJupyURLToClip]
-BL_HANDLERS: ct.BLHandlers = ct.BLHandlers()
-BL_KEYMAP_ITEMS: list[ct.BLKeymapItem] = []

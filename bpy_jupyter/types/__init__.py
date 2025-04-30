@@ -38,8 +38,6 @@ from .bl import (
 	PropName,
 	SocketName,
 )
-from .bl_handlers import BLHandlers
-from .bl_keymap import BLKeymapItem
 from .icons import Icon
 from .operator_types import (
 	OperatorType,
@@ -49,17 +47,18 @@ from .panel_types import (
 )
 
 __all__ = [
-	'addon',
 	'BLClass',
 	'BLColorRGBA',
 	'BLEnumElement',
 	'BLEnumID',
 	'BLEventType',
 	'BLEventValue',
+	'BLHandlers',
+	'BLIDStruct',
 	'BLIcon',
 	'BLIconSet',
-	'BLIDStruct',
 	'BLImportMethod',
+	'BLInstance',
 	'BLKeymapItem',
 	'BLModifierType',
 	'BLNodeTreeInterfaceID',
@@ -67,16 +66,15 @@ __all__ = [
 	'BLPropFlag',
 	'BLRegionType',
 	'BLSpaceType',
+	'Icon',
+	'InstanceID',
 	'KeymapItemDef',
 	'ManagedObjName',
-	'PresetName',
-	'PropName',
-	'SocketName',
-	'BLHandlers',
-	'Icon',
-	'BLInstance',
-	'InstanceID',
 	'NodeTreeType',
 	'OperatorType',
 	'PanelType',
+	'PresetName',
+	'PropName',
+	'SocketName',
+	'addon',
 ]
