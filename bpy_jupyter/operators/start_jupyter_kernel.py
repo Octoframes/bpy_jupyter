@@ -42,7 +42,6 @@ class StartJupyterKernel(bpy.types.Operator):
 
 	def execute(self, context: bpy.types.Context) -> BLOperatorStatus:
 		"""Initialize and run an `IPyKernel` and (optionally) `JupyterLabServer`."""
-		scene = context.scene
 		path_extension_user = Path(
 			bpy.utils.extension_path_user(
 				extension_package,
@@ -56,20 +55,11 @@ class StartJupyterKernel(bpy.types.Operator):
 			path_connection_file=Path(
 				path_extension_user / '.jupyter-connections' / 'connection.json'
 			),
-			path_notebooks=Path(bpy.path.abspath(scene.jupyter_notebook_dir)),
-			jupyter_ip=ipaddress.IPv4Address(scene.jupyter_ip),
-			jupyter_port=scene.jupyter_port,
 		)
 
 		# Start Jupyter Kernel
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.start()
-
-		# Start Jupyter Server
-		##if jupyter_kernel.JUPYTER_LAB_SERVER is not None:
-		##	jupyter_kernel.JUPYTER_LAB_SERVER.start(
-		##		launch_browser=scene.jupyter_launch_browser
-		##	)
 
 		# Start Event Loop
 		async_event_loop.start()

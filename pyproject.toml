@@ -13,14 +13,10 @@ readme = "README.md"
 requires-python = "~= 3.11"
 license = "AGPL-3.0-or-later"
 dependencies = [
-    "rich>=13.9.3",
     "anywidget>=0.9.13",
-    "ipywidgets>=8.1.5",
     "pydantic>=2.9.2",
     "ipykernel==6.29.5",
-    "platformdirs>=4.3.6",
     "pyperclipfix>=1.9.4",
-    "jupyterlab>=3.5.3",
 ]
 
 [project.urls]

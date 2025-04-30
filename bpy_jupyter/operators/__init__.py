@@ -16,10 +16,10 @@
 
 """Blender operators that ship with `bpy_jupyter`."""
 
-from . import copy_jupy_url_to_clip, start_jupyter_kernel, stop_jupyter_kernel
+from . import copy_kern_conn_path_to_clip, start_jupyter_kernel, stop_jupyter_kernel
 
 BL_REGISTER = [
 	*start_jupyter_kernel.BL_REGISTER,
 	*stop_jupyter_kernel.BL_REGISTER,
-	*copy_jupy_url_to_clip.BL_REGISTER,
+	*copy_kern_conn_path_to_clip.BL_REGISTER,
 ]

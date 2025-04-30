@@ -26,15 +26,10 @@ References:
 import asyncio
 import contextlib
 import functools
-import ipaddress
 import multiprocessing
-import os
-import secrets
-import subprocess
 import sys
 import threading
 import time
-import typing as typ
 from pathlib import Path
 
 import pydantic as pyd
@@ -199,137 +194,19 @@ class IPyKernel(pyd.BaseModel):
 
 
 ####################
-# - Class: JupyterLabServer
-####################
-class JupyterLabServer(pyd.BaseModel):
-	path_notebooks: Path
-	path_connection_file: Path
-
-	ip: ipaddress.IPv4Address | ipaddress.IPv6Address = ipaddress.IPv4Address(
-		'127.0.0.1'
-	)
-	port: int = 8998
-	token: pyd.SecretStr = pyd.Field(
-		default_factory=lambda: pyd.SecretStr(secrets.token_urlsafe(32))
-	)
-
-	####################
-	# - Internal State
-	###################
-	_lock: threading.Lock = pyd.PrivateAttr(default_factory=lambda: threading.Lock())
-	_process: subprocess.Popen[typ.Any] | None = pyd.PrivateAttr(default=None)
-
-	_is_running: bool = pyd.PrivateAttr(default=False)
-
-	####################
-	# - Properties: Locked
-	####################
-	@functools.cached_property
-	def is_running(self) -> bool:
-		with self._lock:
-			return self._is_running
-
-	@property
-	def lab_url(self) -> str:
-		return f'http://{self.ip!s}:{self.port!s}/lab?token={self.token.get_secret_value()!s}'
-
-	####################
-	# - Methods: Lifecycle
-	####################
-	def start(self, *, launch_browser: bool = False) -> None:
-		jupyter_py = detect_jupyter_py()
-
-		with self._lock:
-			if not self._is_running and self._process is None:
-				self._process = subprocess.Popen(
-					[
-						sys.executable,
-						'-m',
-						'jupyterlab',
-						f'--app-dir={jupyter_py.parent / "jupyterlab"!s}',
-						f'--ip={self.ip!s}',
-						f'--port={self.port!s}',
-						f'--notebook-dir={self.path_notebooks!s}',
-						f'--IdentityProvider.token={self.token.get_secret_value()!s}',
-						'--ServerApp.allow_external_kernels=True',
-						f'--ServerApp.external_connection_dir={self.path_connection_file.parent!s}',
-						*(['--no-browser'] if not launch_browser else []),
-					],
-					env=os.environ
-					| {
-						'PYTHONPATH': str(jupyter_py.parent),
-					},
-				)
-
-				self._is_running = True
-				with contextlib.suppress(AttributeError):
-					del self.is_running
-
-			elif not self._is_running and self._process is not None:
-				msg = (
-					'JupyterLabServer is not running, but has a process. This is a bug.'
-				)
-				raise RuntimeError(msg)
-			else:
-				msg = "JupyterLabServer cannot be started, since it's already running."
-				raise ValueError(msg)
-
-	def stop(self) -> None:
-		with self._lock:
-			if self._is_running and self._process is not None:
-				self._is_running = False
-				with contextlib.suppress(AttributeError):
-					del self.is_running
-
-				self._process.kill()
-				_ = self._process.wait()
-
-				_process = self._process
-				self._process = None
-				del _process
-
-				## TODO: Check refcount?
-				## TODO: Force GC?
-
-			elif self._is_running and self._process is None:
-				msg = 'JupyterLabServer is running, but has no kernel. This is a bug.'
-				raise RuntimeError(msg)
-			else:
-				msg = "JupyterLabServer cannot be stopped, since it's not running."
-				raise ValueError(msg)
-
-
-####################
 # - Globals
 ####################
 IPYKERNEL: IPyKernel | None = None
-JUPYTER_LAB_SERVER: JupyterLabServer | None = None
 
 
-def init(
-	*,
-	path_connection_file: Path,
-	path_notebooks: Path,
-	jupyter_ip: ipaddress.IPv4Address | ipaddress.IPv6Address,
-	jupyter_port: int,
-) -> None:
-	global IPYKERNEL, JUPYTER_LAB_SERVER
+def init(*, path_connection_file: Path) -> None:
+	global IPYKERNEL
 
 	if IPYKERNEL is None or not IPYKERNEL.is_running:
 		IPYKERNEL = IPyKernel(path_connection_file=path_connection_file)
+
 	elif IPYKERNEL.is_running:
 		msg = "Can't re-initialize `BPY_KERNEL`, since it is running."
-		raise ValueError(msg)
-
-	if JUPYTER_LAB_SERVER is None or not JUPYTER_LAB_SERVER.is_running:
-		JUPYTER_LAB_SERVER = JupyterLabServer(
-			path_notebooks=path_notebooks,
-			path_connection_file=path_connection_file,
-			ip=jupyter_ip,
-			port=jupyter_port,
-		)
-	elif JUPYTER_LAB_SERVER.is_running:
-		msg = "Can't re-initialize `JUPYTER_LAB_SERVER`, since it is running."
 		raise ValueError(msg)
 
 
