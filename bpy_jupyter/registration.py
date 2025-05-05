@@ -42,7 +42,7 @@ def register_classes(bl_classes: cabc.Sequence[type[BLClass]]) -> None:
 		If a class is already registered (aka. its `bl_idname` already has an entry), then its registration is skipped.
 
 	Parameters:
-		bl_register: List of Blender classes to register.
+		bl_classes: List of Blender classes to register.
 	"""
 	for cls in bl_classes:
 		if cls.bl_idname in _REGISTERED_CLASSES:
