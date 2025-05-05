@@ -6,8 +6,8 @@ authors = [
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
 ]
 maintainers = [
+    { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" },
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
-    { name = "Jan-Hendrik Mueller", email = "bpyjupyter@sofusrose.com" }
 ]
 readme = "README.md"
 requires-python = "~= 3.11"
@@ -80,8 +80,17 @@ network = 'Exposes five sockets to communicate with the Jupyter kernel'
 managed = true
 package = false
 dev-dependencies = [
+    "basedpyright>=1.29.1",
     "blext",
     "fake-bpy-module>=20250505",
+    "mkdocs>=1.6.1",
+    "mkdocs-github-admonitions-plugin>=0.0.3",
+    "mkdocs-macros-plugin>=1.3.7",
+    "mkdocs-material>=9.6.12",
+    "mkdocstrings[python]>=0.29.1",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "ruff>=0.11.8",
 ]
 conflicts = [
     [
@@ -149,13 +158,9 @@ ignore = [
 	"Q002",  # Conflicts w/Formatter
 	"Q003",  # Conflicts w/Formatter
 	"D206", # Conflicts w/Formatter
-	"B008", # FastAPI uses this for Depends(), Security(), etc. .
 	"E701", # class foo(Parent): pass or if simple: return are perfectly elegant
 	"ERA001", # 'Commented-out code' seems to be just about anything to ruff
-	"F722", # jaxtyping uses type annotations that ruff sees as "syntax error"
-	"N806", # Sometimes we like using types w/uppercase in functions, sue me
 	"RUF001", # We use a lot of unicode, yes, on purpose!
-	#"RUF012", # ruff misunderstands which ClassVars are actually mutable.
 
 	# Line Length - Controversy Incoming
 	## Hot Take: Let the Formatter Worry about Line Length
@@ -167,13 +172,6 @@ ignore = [
 	"E501",  # Let Formatter Worry about Line Length
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = [
-	"SLF001", # It's okay to not have module-level docstrings in test modules.
-	"D100", # It's okay to not have module-level docstrings in test modules.
-	"D104", # Same for packages.
-]
-
 ####################
 # - Tooling: Ruff Sublinters
 ####################
@@ -181,7 +179,7 @@ ignore = [
 extend-immutable-calls = []
 
 [tool.ruff.lint.pycodestyle]
-max-doc-length = 120
+max-doc-length = 88
 ignore-overlong-task-comments = true
 
 [tool.ruff.lint.pydocstyle]
@@ -194,6 +192,7 @@ max-args = 6
 # - Tooling: Ruff Formatter
 ####################
 [tool.ruff.format]
+preview = true
 quote-style = "single"
 indent-style = "tab"
 docstring-code-format = false
@@ -205,29 +204,36 @@ docstring-code-format = false
 [tool.basedpyright]
 defineConstant = { DEBUG = true }
 
-#include = ["blext"]
-#strict = ["blext"]
+include = ["bpy_jupyter"]
 
 reportMissingImports = "error"
 reportMissingTypeStubs = true
-reportAny = false
+
+reportAny = false  ## fake-bpy-module is not friends with this.
+reportUnknownMemberType = false  ## Nor with this!
 
 executionEnvironments = [
-  { root = "bpy_jupyter", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages" ] },
-  #{ root = "blext", pythonVersion = "3.11" },
   { root = ".", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages" ] },
 ]
+
+####################
+# - Tooling: pytest
+####################
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 
 ####################
 # - Tooling: Commits
 ####################
 [tool.commitizen]
-# Specification
-name = "cz_conventional_commits"
+name = "cz_gitmoji"
 version_scheme = "semver2"
-version_provider = "pep621"
+version_provider = "uv"
 tag_format = "v$version"
+
+# Files
+changelog_file = "CHANGELOG.md"
 
 # Version Bumping
 retry_after_failure = true
@@ -237,9 +243,3 @@ update_changelog_on_bump = true
 # Annotations / Signature
 gpg_sign = true
 annotated_tag = true
-
-####################
-# - Tooling: Pytest
-####################
-[tool.pytest.ini_options]
-testpaths = ["tests"]

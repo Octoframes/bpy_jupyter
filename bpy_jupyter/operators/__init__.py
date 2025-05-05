@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Blender operators that ship with `bpy_jupyter`."""
+"""Operators that ship with this extension."""
 
 from . import copy_kern_conn_path_to_clip, start_jupyter_kernel, stop_jupyter_kernel
 

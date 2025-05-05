@@ -21,10 +21,22 @@ repos:
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.9.1
+    rev: v0.11.8
     hooks:
       # ruff lint
-      #- id: ruff
-        #args: [ --fix ]
+      - id: ruff
       # ruff fmt
       - id: ruff-format
+
+  - repo: https://github.com/DetachHead/basedpyright-pre-commit-mirror
+    rev: 1.29.1
+    hooks:
+      - id: basedpyright
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.1.0
+    hooks:
+      - id: commitizen
+        additional_dependencies: [cz-conventional-gitmoji]
+      - id: commitizen-branch
+        stages: [push]

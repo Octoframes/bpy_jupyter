@@ -14,27 +14,43 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import bpy
+"""Implements `JupyterPanel`."""
 
-from ..types import OperatorType, PanelType
+import typing as typ
+
+import bpy
+import typing_extensions as typ_ext
+
+if typ.TYPE_CHECKING:
+	from bpy._typing import rna_enums
+
+
+from ..types import BLContextType, OperatorType, PanelType
 
 
 ####################
 # - Scene Properties
 ####################
 class JupyterPanel(bpy.types.Panel):
-	"""'Controls the Jupyter kernel launched using Blender."""
+	"""Control the Jupyter kernel launched using Blender.
 
-	## TODO: Provide an option that forces appending? So that users can modify from a baseline. Just watch out - dealing with overlaps isn't trivial.
+	Attributes:
+		bl_idname: Name of this panel type.
+		bl_label: Human-oriented label for this panel.
+		bl_space_type: The space to display this panel in.
+		bl_region_type: The region to display this panel in.
+		bl_context: Extra context guiding where this panel should be placed.
+	"""
 
-	bl_idname = PanelType.JupyterPanel
-	bl_label = 'Jupyter Kernels'
-	bl_space_type = 'PROPERTIES'
-	bl_region_type = 'WINDOW'
-	bl_context = 'scene'
+	bl_idname: str = PanelType.JupyterPanel
+	bl_label: str = 'Jupyter Kernels'
+	bl_space_type: 'rna_enums.SpaceTypeItems' = 'PROPERTIES'
+	bl_region_type: 'rna_enums.RegionTypeItems' = 'WINDOW'
+	bl_context: BLContextType = 'scene'  # pyright: ignore[reportIncompatibleVariableOverride]
 
-	def draw(self, _: bpy.types.Context) -> None:
-		"""Draw the Jupyter panel w/options.
+	@typ_ext.override
+	def draw(self, context: bpy.types.Context) -> None:
+		"""Draw the Jupyter kernel panel, including a few options.
 
 		Notes:
 			Run by Blender when the panel needs to be displayed.
@@ -44,30 +60,32 @@ class JupyterPanel(bpy.types.Panel):
 				Must contain `context.window_manager` and `context.workspace`.
 		"""
 		layout = self.layout
+		if layout is None:
+			return
 
 		####################
 		# - Section: Stop/Start Kernel
 		####################
 		# Operator: Start Kernel
 		row = layout.row(align=True)
-		row.operator(OperatorType.StartJupyterKernel)
+		_ = row.operator(OperatorType.StartJupyterKernel)
 
 		# Operator: Stop Kernel
 		row = layout.row(align=True)
-		row.operator(OperatorType.StopJupyterKernel)
+		_ = row.operator(OperatorType.StopJupyterKernel)
 
 		####################
 		# - Section: Copyable URLs
 		####################
 		header, body = layout.panel(
-			'jupyter_copy_urls_subpanel',
+			PanelType.JupyterPanel + '_copy_urls_subpanel',
 			default_closed=False,
 		)
 		header.label(text='Copy to Clipboard')
-		if body is not None:
+		if body is not None:  # pyright: ignore[reportUnnecessaryComparison]
 			# Operators
 			row = body.row(align=False)
-			op = row.operator(OperatorType.CopyKernConnPath)
+			_ = row.operator(OperatorType.CopyKernConnPath)
 
 
 ####################

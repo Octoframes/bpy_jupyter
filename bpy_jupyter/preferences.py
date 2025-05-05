@@ -18,9 +18,11 @@
 
 import bpy
 
+from .types import EXT_PACKAGE
+
 
 ####################
-# - Preferences
+# - Class: Preferences
 ####################
 class BPYJupyterAddonPrefs(bpy.types.AddonPreferences):
 	"""Manages user preferences and settings for the Blender Maxwell addon.
@@ -33,7 +35,7 @@ class BPYJupyterAddonPrefs(bpy.types.AddonPreferences):
 		use_default_pydeps_path: Whether to use the default PyDeps path
 	"""
 
-	bl_idname = __package__
+	bl_idname: str = EXT_PACKAGE
 
 
 ####################

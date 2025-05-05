@@ -97,7 +97,7 @@ def start() -> None:
 
 		**DO NOT** run if an event loop has already been started using `start()`.
 	"""
-	bpy.app.timers.register(increment_event_loop, persistent=True)  # pyright: ignore[reportUnknownMemberType]
+	bpy.app.timers.register(increment_event_loop, persistent=True)
 
 
 def stop():
@@ -108,4 +108,4 @@ def stop():
 
 		**DO NOT** run if an event loop has not already been started using `start()`.
 	"""
-	bpy.app.timers.unregister(increment_event_loop)  # pyright: ignore[reportUnknownMemberType]
+	bpy.app.timers.unregister(increment_event_loop)

@@ -14,46 +14,68 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Defines the `CopyJupyURLToClip` operator.
+"""Defines the `CopyJupyURLToClip` operator."""
 
-Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_notebook/kernel.py>
-"""
+import typing as typ
 
 import bpy
 import pyperclipfix
+import typing_extensions as typ_ext
 
 from ..services import jupyter_kernel
-from ..types import BLOperatorStatus, OperatorType
+from ..types import OperatorType
+
+if typ.TYPE_CHECKING:
+	from bpy._typing import rna_enums
 
 
 ####################
 # - Constants
 ####################
 class CopyKernConnPath(bpy.types.Operator):
-	"""Copy a Jupyter Server URL to the system clipboard. The system clipboard will be cleared after a timeout, unless otherwise altered."""
+	"""Copy the path to the kernel connection file to the clipboard.
 
-	bl_idname = OperatorType.CopyKernConnPath
-	bl_label = 'Copy Kernel Connection Path'
+	Attributes:
+		bl_idname: Name of this operator type.
+		bl_label: Human-oriented label for this operator.
+	"""
 
+	bl_idname: str = OperatorType.CopyKernConnPath
+	bl_label: str = 'Copy Kernel Connection Path'
+
+	@typ_ext.override
 	@classmethod
-	def poll(cls, _: bpy.types.Context) -> bool:
+	def poll(cls, context: bpy.types.Context) -> bool:
+		"""Can run while a Jupyter kernel is running.
+
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
 		return jupyter_kernel.is_kernel_running()
 
-	def execute(self, _: bpy.types.Context) -> BLOperatorStatus:
-		if jupyter_kernel.IPYKERNEL is not None:
-			path_connection_file = jupyter_kernel.IPYKERNEL.path_connection_file
-			pyperclipfix.copy(str(path_connection_file))
+	@typ_ext.override
+	def execute(
+		self, context: bpy.types.Context
+	) -> set['rna_enums.OperatorReturnItems']:
+		"""Copy the path to the running connection file, to the system clipboard.
 
-			self.report(
-				{'INFO'},
-				'Copied IPyKernel Connection Path to System Clipboard.',
-			)
-			return {'RUNNING_MODAL'}
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
+		if jupyter_kernel.IPYKERNEL is None:
+			msg = "IPyKernel is `None`. This is a bug - generally, `poll()` should guarantee that this doesn't happen."
+			raise RuntimeError(msg)
+
+		path_connection_file = jupyter_kernel.IPYKERNEL.path_connection_file
+		pyperclipfix.copy(str(path_connection_file))
+
 		self.report(
-			{'ERROR'},
-			"IPyKernel hasn't been initialized, and therefore has no connection file path.",
+			{'INFO'},
+			'Copied IPyKernel Connection File Path to Clipboard.',
 		)
-		return {'CANCELLED'}
+		return {'FINISHED'}
 
 
 ####################

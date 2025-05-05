@@ -14,17 +14,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Manages the registration of Blender classes, including delayed registrations that require access to Python dependencies.
+"""Manages the registration of Blender classes.
 
 Attributes:
-	_REGISTERED_CLASSES: Blender classes currently registered by this addon.
-	_REGISTERED_KEYMAPS: Addon keymaps currently registered by this addon.
-		Each addon keymap is constrained to a single `space_type`, which is the key.
-	_REGISTERED_KEYMAP_ITEMS: Addon keymap items currently registered by this addon.
-		Each keymap item is paired to the keymap within which it is registered.
-		_Each keymap is guaranteed to also be found in `_REGISTERED_KEYMAPS`._
-	_REGISTERED_HANDLERS: Addon handlers currently registered by this addon.
+	_REGISTERED_CLASSES: Blender classes currently registered by this addon, indexed by `bl_idname`.
 """
+
+import collections.abc as cabc
 
 import bpy
 
@@ -33,14 +29,17 @@ from .types import BLClass
 ####################
 # - Globals
 ####################
-_REGISTERED_CLASSES = list[BLClass]()
+_REGISTERED_CLASSES = dict[str, type[BLClass]]()
 
 
 ####################
 # - Class Registration
 ####################
-def register_classes(bl_classes: list[BLClass]) -> None:
+def register_classes(bl_classes: cabc.Sequence[type[BLClass]]) -> None:
 	"""Registers a list of Blender classes.
+
+	Notes:
+		If a class is already registered (aka. its `bl_idname` already has an entry), then its registration is skipped.
 
 	Parameters:
 		bl_register: List of Blender classes to register.
@@ -50,12 +49,12 @@ def register_classes(bl_classes: list[BLClass]) -> None:
 			continue
 
 		bpy.utils.register_class(cls)
-		_REGISTERED_CLASSES.append(cls)
+		_REGISTERED_CLASSES[cls.bl_idname] = cls
 
 
 def unregister_classes() -> None:
 	"""Unregisters all previously registered Blender classes."""
-	for cls in reversed(_REGISTERED_CLASSES):
+	for cls in reversed(_REGISTERED_CLASSES.values()):
 		bpy.utils.unregister_class(cls)
 
 	_REGISTERED_CLASSES.clear()

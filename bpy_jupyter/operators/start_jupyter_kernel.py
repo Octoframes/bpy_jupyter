@@ -14,43 +14,66 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Defines the `StartJupyterKernel` operator.
+"""Defines the `StartJupyterKernel` operator."""
 
-Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_notebook/kernel.py>
-"""
-
-import ipaddress
+import typing as typ
 from pathlib import Path
 
 import bpy
+import typing_extensions as typ_ext
 
-from .. import __package__ as extension_package
 from ..services import async_event_loop, jupyter_kernel
-from ..types import BLOperatorStatus, OperatorType
+from ..types import EXT_PACKAGE, OperatorType
+
+if typ.TYPE_CHECKING:
+	from bpy._typing import rna_enums
 
 
+####################
+# - Class: Start Jupyter Kernel
+####################
 class StartJupyterKernel(bpy.types.Operator):
-	"""Start a notebook kernel, and Jupyter Lab server, from within Blender."""
+	"""Start a notebook kernel, and Jupyter Lab server, from within Blender.
 
-	bl_idname = OperatorType.StartJupyterKernel
-	bl_label = 'Start Jupyter Kernel'
+	Attributes:
+		bl_idname: Name of this operator type.
+		bl_label: Human-oriented label for this operator.
+	"""
 
+	bl_idname: str = OperatorType.StartJupyterKernel
+	bl_label: str = 'Start Jupyter Kernel'
+
+	@typ_ext.override
 	@classmethod
-	def poll(cls, _: bpy.types.Context) -> bool:
-		"""Allow running this operator when no kernel is running."""
+	def poll(cls, context: bpy.types.Context) -> bool:
+		"""Can run while a Jupyter kernel is not running.
+
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
 		return not jupyter_kernel.is_kernel_running()
 
-	def execute(self, context: bpy.types.Context) -> BLOperatorStatus:
-		"""Initialize and run an `IPyKernel` and (optionally) `JupyterLabServer`."""
+	@typ_ext.override
+	def execute(
+		self, context: bpy.types.Context
+	) -> set['rna_enums.OperatorReturnItems']:
+		"""Start an embedded jupyter kernel, as well as an `asyncio` event loop to handle kernel clients.
+
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
 		path_extension_user = Path(
 			bpy.utils.extension_path_user(
-				extension_package,
+				EXT_PACKAGE,
 				path='',
 				create=True,
 			)
 		).resolve()
+		## TODO: Get from preferences.
 
-		# Initialize Jupyter Kernel + Server
+		# (Re)Initialize Jupyter Kernel
 		jupyter_kernel.init(
 			path_connection_file=Path(
 				path_extension_user / '.jupyter-connections' / 'connection.json'
@@ -61,7 +84,7 @@ class StartJupyterKernel(bpy.types.Operator):
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.start()
 
-		# Start Event Loop
+		# Start asyncio Event Loop
 		async_event_loop.start()
 
 		return {'FINISHED'}

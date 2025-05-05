@@ -14,29 +14,55 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Defines the `StopJupyterKernel` operator.
+"""Defines the `StopJupyterKernel` operator."""
 
-Inspired by <https://github.com/cheng-chi/blender_notebook/blob/master/blender_notebook/kernel.py>
-"""
+import typing as typ
 
 import bpy
+import typing_extensions as typ_ext
 
 from ..services import async_event_loop, jupyter_kernel
-from ..types import BLOperatorStatus, OperatorType
+from ..types import OperatorType
+
+if typ.TYPE_CHECKING:
+	from bpy._typing import rna_enums
 
 
+####################
+# - Class: Stop Jupyter Kernel
+####################
 class StopJupyterKernel(bpy.types.Operator):
-	"""Stop a notebook kernel and Jupyter Lab server running within Blender."""
+	"""Stop a notebook kernel and Jupyter Lab server running within Blender.
 
-	bl_idname = OperatorType.StopJupyterKernel
-	bl_label = 'Stop Jupyter Kernel'
+	Attributes:
+		bl_idname: Name of this operator type.
+		bl_label: Human-oriented label for this operator.
+	"""
 
+	bl_idname: str = OperatorType.StopJupyterKernel
+	bl_label: str = 'Stop Jupyter Kernel'
+
+	@typ_ext.override
 	@classmethod
-	def poll(cls, _: bpy.types.Context) -> bool:
+	def poll(cls, context: bpy.types.Context) -> bool:
+		"""Can run while a Jupyter kernel is running.
+
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
 		return jupyter_kernel.is_kernel_running()
 
-	def execute(self, _: bpy.types.Context) -> BLOperatorStatus:
-		"""Stop a running `IPyKernel` and (optionally) `JupyterLabServer`."""
+	@typ_ext.override
+	def execute(
+		self, context: bpy.types.Context
+	) -> set['rna_enums.OperatorReturnItems']:
+		"""Start the embedded jupyter kernel, as well as the `asyncio` event loop managed by this extension.
+
+		Parameters:
+			context: The current `bpy` context.
+				_Not used._
+		"""
 		# Stop Jupyter Kernel
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.stop()

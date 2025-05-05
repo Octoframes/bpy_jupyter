@@ -14,12 +14,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Types, enums and constants for use throughout this extension.
+
+Attributes:
+	BLClass: All Blender classes that the user can register.
+	BLRegionType: All valid values for `bl_region_type`.
+
+See Also:
+	Deducing Valid `bl_context`: <https://blender.stackexchange.com/questions/73145/when-declaring-a-panel-what-does-the-bl-context-value-need-to-be>
+
+
+"""
+
 import enum
 import tomllib
 import typing as typ
 from pathlib import Path
 
 import bpy
+
+if __package__ is None:
+	msg = "Extension `__package__` is `None`. This shouldn't be possible in a Blender extension."
+	raise RuntimeError(msg)
 
 ####################
 # - Types
@@ -34,9 +50,60 @@ BLClass: typ.TypeAlias = (
 	| bpy.types.RenderEngine
 	| bpy.types.AssetShelf
 	| bpy.types.FileHandler
+	| bpy.types.AddonPreferences
 )
-BLOperatorStatus: typ.TypeAlias = set[
-	typ.Literal['RUNNING_MODAL', 'CANCELLED', 'FINISHED', 'PASS_THROUGH', 'INTERFACE']
+BLContextType: typ.TypeAlias = typ.Literal[
+	'.armature_edit',
+	'.curves_sculpt',
+	'.grease_pencil_paint',
+	'.greasepencil_paint',
+	'.greasepencil_sculpt',
+	'.greasepencil_vertex',
+	'.greasepencil_weight',
+	'.imagepaint',
+	'.imagepaint_2d',
+	'.mesh_edit',
+	'.objectmode',
+	'.paint_common',
+	'.paint_common_2d',
+	'.particlemode',
+	'.posemode',
+	'.sculpt_mode',
+	'.uv_sculpt',
+	'.vertexpaint',
+	'.weightpaint',
+	'addons',
+	'animation',
+	'bone',
+	'bone_constraint',
+	'collection',
+	'constraint',
+	'data',
+	'editing',
+	'experimental',
+	'extensions',
+	'file_paths',
+	'input',
+	'interface',
+	'keymap',
+	'lights',
+	'material',
+	'modifier',
+	'navigation',
+	'object',
+	'output',
+	'particle',
+	'physics',
+	'render',
+	'save_load',
+	'scene',
+	'shaderfx',
+	'system',
+	'texture',
+	'themes',
+	'view_layer',
+	'viewport',
+	'world',
 ]
 
 ####################
@@ -48,6 +115,7 @@ with PATH_MANIFEST.open('rb') as f:
 	MANIFEST = tomllib.load(f)
 
 EXT_NAME: str = MANIFEST['id']
+EXT_PACKAGE: str = __package__
 
 ####################
 # - Panel Type

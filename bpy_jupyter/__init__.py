@@ -17,11 +17,12 @@
 """A visual DSL for electromagnetic simulation design and analysis implemented as a Blender node editor."""
 
 from . import operators, panels, preferences, registration
+from .types import BLClass
 
 ####################
 # - Load and Register Addon
 ####################
-BL_REGISTER = [
+BL_REGISTER: list[type[BLClass]] = [
 	*preferences.BL_REGISTER,
 	*operators.BL_REGISTER,
 	*panels.BL_REGISTER,
