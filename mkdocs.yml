@@ -1,0 +1,78 @@
+site_name: bpy_jupyter
+
+nav:
+  - Overview: index.md
+  - features.md
+  - installation.md
+  #- User Guides:
+  #  - user_guides/getting_started.md
+  #- Resources:
+  #  - resources/extension_resources.md
+  #  - resources/git_resources.md
+  - Reference:
+    - Release Notes: reference/release_notes.md
+    #- Policies:
+    #  - reference/policies/versioning.md
+    #  - reference/policies/licensing.md
+    #  - reference/policies/contributing.md
+    #  - reference/policies/schemas.md
+    - Python API:
+      - reference/python_api/bpy_jupyter.md
+      - reference/python_api/bpy_jupyter_operators.md
+      - reference/python_api/bpy_jupyter_panels.md
+      - reference/python_api/bpy_jupyter_services.md
+      - reference/python_api/bpy_jupyter_utils.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - footnotes
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+theme:
+  language: en
+  name: "material"
+  palette:
+    scheme: slate
+    primary: purple
+    accent: orange
+  features:
+    - navigation.sections
+    - content.tabs.link
+
+plugins:
+- termynal
+- search
+- autorefs
+- privacy
+- offline
+- gh-admonitions
+- macros
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          allow_inspection: true
+          parameter_headings: false
+          show_root_heading: true
+          group_by_category: true
+          show_category_heading: false
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          docstring_style: google
+          merge_init_into_class: true
+          separate_signature: true
+          show_signature_annotations: true
+          show_overloads: true
+          signature_crossrefs: true
+          unwrap_annotated: true
+          docstring_section_style: spacy
+          extensions:
+            - griffe_pydantic:
+              schema: true
+        inventories:
+          - https://installer.readthedocs.io/en/stable/objects.inv

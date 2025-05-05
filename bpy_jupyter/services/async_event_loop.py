@@ -16,7 +16,7 @@
 
 """Manages an `asyncio` event loop, which allows running asynchronous extension code in the main thread of Blender.
 
-## Motivation: Waiting for Godo... Something to Happen
+## Motivation
 Blender's Python API is not thread safe, meaning that the main thread must be used to update all ex. properties, UI elements, etc. .
 At the same time, when Python code runs in Blender's main thread, the UI becomes unresponsive until it is finished.
 What to do?
@@ -74,7 +74,7 @@ def increment_event_loop() -> float:
 	Since the event loop retains its state, and ability to accept tasks, after `loop.stop()`, doing this repeatedly amounts to a frequently invoked "pause and flush".
 
 	Notes:
-		**To enable**, use `bpy.app.timers.register(..., persistent=True)`.
+		**To enable**, use `bpy.app.timers.register(increment_event_loop, persistent=True)`.
 
 	Returns:
 		The number of seconds to wait before running this function again.

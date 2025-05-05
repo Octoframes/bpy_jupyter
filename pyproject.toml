@@ -83,6 +83,7 @@ dev-dependencies = [
     "basedpyright>=1.29.1",
     "blext",
     "fake-bpy-module>=20250505",
+    "griffe-pydantic>=1.1.4",
     "mkdocs>=1.6.1",
     "mkdocs-github-admonitions-plugin>=0.0.3",
     "mkdocs-macros-plugin>=1.3.7",
@@ -91,6 +92,7 @@ dev-dependencies = [
     "pytest>=8.3.5",
     "pytest-cov>=6.1.1",
     "ruff>=0.11.8",
+    "termynal>=0.13.0",
 ]
 conflicts = [
     [
