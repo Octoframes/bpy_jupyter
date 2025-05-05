@@ -51,7 +51,6 @@ class StartJupyterKernel(bpy.types.Operator):
 		).resolve()
 
 		# Initialize Jupyter Kernel + Server
-		print('starting the start')
 		jupyter_kernel.init(
 			path_connection_file=Path(
 				path_extension_user / '.jupyter-connections' / 'connection.json'
@@ -59,10 +58,8 @@ class StartJupyterKernel(bpy.types.Operator):
 		)
 
 		# Start Jupyter Kernel
-		print('starting')
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.start()
-		print('can you see me?')
 
 		# Start Event Loop
 		async_event_loop.start()

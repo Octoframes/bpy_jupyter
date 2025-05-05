@@ -37,16 +37,12 @@ class StopJupyterKernel(bpy.types.Operator):
 
 	def execute(self, _: bpy.types.Context) -> BLOperatorStatus:
 		"""Stop a running `IPyKernel` and (optionally) `JupyterLabServer`."""
-		print('stopping the stop')
-
 		# Stop Jupyter Kernel
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.stop()
 
 		# Stop Event Loop
 		async_event_loop.stop()
-
-		print('stopped the stop')
 
 		return {'FINISHED'}
 

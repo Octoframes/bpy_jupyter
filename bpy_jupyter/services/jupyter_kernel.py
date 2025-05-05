@@ -163,6 +163,7 @@ class IPyKernel(pyd.BaseModel):
 				)
 
 				# This part actually matters.
+				self._kernel_app.kernel.shell_class.clear_instance()
 				self._kernel_app.kernel.shell_stream.flush()
 				self._kernel_app.kernel.shell_stream.close(linger=0)
 				self._kernel_app.kernel.control_stream.flush()
@@ -176,7 +177,6 @@ class IPyKernel(pyd.BaseModel):
 				# _ = sys.stdout.flush()
 				# _ = sys.stderr.flush()
 
-				# print(4)
 				# Close I/O and Sockets
 				## Calls reset_io()
 				## - Restores sys.stdout, sys.stderr, sys.displayhook to originals.
@@ -190,35 +190,23 @@ class IPyKernel(pyd.BaseModel):
 				## Closes stdin_socket Socket
 				self._kernel_app.close()  # type: ignore[no-untyped-call]
 
-				print(5)
 				# Manual: Close Connection File
 				self._kernel_app.cleanup_connection_file()
 
-				print(6)
 				# Clear Singleton Instances
 				## - Prevent resurrection of the same object.
 				## - IPKernelApp.Kernel is also a singleton.
 				self._kernel_app.kernel.clear_instance()
 				self._kernel_app.clear_instance()
 
-				print(7)
 				# Clear Singleton Instances
 				_kernel = self._kernel_app
 				self._kernel_app = None
 				del _kernel
 
-				print(8)
 				# For good measure, force an immediate GC.
 				## Hey, call me superstitious.
 				_ = gc.collect()
-
-				# Also restore sys.stdwhatever
-				## ...Yikes
-				# sys.stdout = _stdout
-				# sys.stderr = _stderr
-				# sys.displayhook = _displayhook
-
-				print(9)
 
 				with contextlib.suppress(AttributeError):
 					del self.is_running
