@@ -1,7 +1,7 @@
 [project]
 name = "bpy_jupyter"
 version = "0.2.0"
-description = "Interact with Blender using Jupyter notebooks"
+description = "Run a Jupyter kernel embedded asynchronously within Blender"
 authors = [
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
 ]
@@ -68,22 +68,21 @@ supported_platforms = [
 	'macos-arm64',
 	'windows-x64',
 ]
-#min_glibc_version = [2, 28]
-#min_macos_version = [12, 0]
 
 [tool.blext.permissions]
-files = 'Need to create a kernel connection file on the disk'
+files = 'Creates a Jupyter kernel connection file on the filesystem'
+networks = 'Exposes five ZeroMQ sockets to communicate with the Jupyter kernel'
 
 ####################
 # - Blender Extension
 ####################
 [tool.uv]
 managed = true
+package = false
 dev-dependencies = [
     "blext",
-    "bpy>=4.4.0",
+    "fake-bpy-module>=20250505",
 ]
-package = false
 conflicts = [
     [
         {extra = "blender4_3"}, # # ⭳⭳⭳ MANAGED BY BLEXT ⭳⭳⭳
@@ -211,9 +210,10 @@ defineConstant = { DEBUG = true }
 
 reportMissingImports = "error"
 reportMissingTypeStubs = true
+reportAny = false
 
 executionEnvironments = [
-  { root = "bpy_jupyter", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages", ".venv/lib/python3.11/site-packages/bpy/4.3/scripts/modules" ] },
+  { root = "bpy_jupyter", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages" ] },
   #{ root = "blext", pythonVersion = "3.11" },
   { root = ".", pythonVersion = "3.11", extraPaths = [ ".venv/lib/python3.11/site-packages" ] },
 ]

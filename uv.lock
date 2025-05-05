@@ -92,24 +92,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bpy"
-version = "4.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "cython" },
-    { name = "numpy" },
-    { name = "requests" },
-    { name = "zstandard" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/9a/3602426e41e1c912e0557774a69ec4cddca5a2251687db265a2817c9a62b/bpy-4.4.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:3b8736699a6ea06fed33d2e3042cdd5555409d0b51e2b7274f38be3f9bf774f4", size = 217733774, upload_time = "2025-03-18T11:13:31.147Z" },
-    { url = "https://files.pythonhosted.org/packages/0f/5e/7f64271fb211d02859917c786b0273964570b9242b497f29913955eeca72/bpy-4.4.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:9609454d84fd4d668adc82f839d14817f56a14179dd0ddf02ac24580be5ca77b", size = 231678638, upload_time = "2025-03-18T11:14:25.761Z" },
-    { url = "https://files.pythonhosted.org/packages/99/ef/28b7850065934fa9797f612cd52f13b9fd74574907bb886882fb18e13065/bpy-4.4.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:50ee92155cdb8740214fa3b29d9a45ee90cda9dc15eb978860916de468b8580f", size = 368892624, upload_time = "2025-03-18T11:14:01.688Z" },
-    { url = "https://files.pythonhosted.org/packages/a9/b1/bb03b0c4f78c13f30e871d5f1d68cf27c85096aef3cb2de1e061bd8766bd/bpy-4.4.0-cp311-cp311-win_amd64.whl", hash = "sha256:6281ddd11ebe6008db143f422d7dd709c520f3f3574814dd37dda6d9cd85a1ae", size = 324938053, upload_time = "2025-03-18T11:12:51.963Z" },
-    { url = "https://files.pythonhosted.org/packages/40/9b/a9acaf9ec0a88a065bd92328c35ff7ba17af93bc7b2611ad01ee26bdcfa8/bpy-4.4.0-cp311-cp311-win_arm64.whl", hash = "sha256:5658b7f9e13dc90a64419038a52585a581fc9ab53ec909bf5199946226f4b0c0", size = 189065128, upload_time = "2025-03-18T11:13:10.219Z" },
-]
-
-[[package]]
 name = "bpy-jupyter"
 version = "0.2.0"
 source = { virtual = "." }
@@ -153,7 +135,7 @@ blender4-4 = [
 [package.dev-dependencies]
 dev = [
     { name = "blext" },
-    { name = "bpy" },
+    { name = "fake-bpy-module" },
 ]
 
 [package.metadata]
@@ -192,7 +174,7 @@ provides-extras = ["blender4-3", "blender4-4"]
 [package.metadata.requires-dev]
 dev = [
     { name = "blext", git = "https://codeberg.org/so-rose/blext.git" },
-    { name = "bpy", specifier = ">=4.4.0" },
+    { name = "fake-bpy-module", specifier = ">=20250505" },
 ]
 
 [[package]]
@@ -362,6 +344,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/91/50/a9d80c47ff289c611ff12e63f7c5d13942c65d68125160cefd768c73e6e4/executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755", size = 978693, upload_time = "2025-01-22T15:41:29.403Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/8f/c4d9bafc34ad7ad5d8dc16dd1347ee0e507a52c3adb6bfa8887e1c6a26ba/executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa", size = 26702, upload_time = "2025-01-22T15:41:25.929Z" },
+]
+
+[[package]]
+name = "fake-bpy-module"
+version = "20250505"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/0c/70e6285da2eb6dcc8b68b9eb842a4c85fcb9ade24518149cfd891f6bd96f/fake_bpy_module-20250505.tar.gz", hash = "sha256:4c65c68e9025f2dfe523f04b184642d32663969d4100ea729d1270d7ecd4a056", size = 961346, upload_time = "2025-05-05T06:19:07.375Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/88/5b6bac8adc788e30b4a99de6ca4099e1c1cc0863266c93b9a9bac0cb02f4/fake_bpy_module-20250505-py3-none-any.whl", hash = "sha256:1ce6fd518586ec7facb4a1b50a3e5d98374546b5b5c82bdfea6e173598a383d7", size = 1086304, upload_time = "2025-05-05T06:19:05.038Z" },
 ]
 
 [[package]]
