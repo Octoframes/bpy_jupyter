@@ -14,8 +14,8 @@ requires-python = "~= 3.11"
 license = "AGPL-3.0-or-later"
 dependencies = [
     "anywidget>=0.9.13",
-    "pydantic>=2.9.2",
     "ipykernel==6.29.5",
+    "pydantic>=2.9.2",
     "pyperclipfix>=1.9.4",
 ]
 
@@ -71,7 +71,7 @@ supported_platforms = [
 
 [tool.blext.permissions]
 files = 'Creates a Jupyter kernel connection file on the filesystem'
-networks = 'Exposes five ZeroMQ sockets to communicate with the Jupyter kernel'
+network = 'Exposes five sockets to communicate with the Jupyter kernel'
 
 ####################
 # - Blender Extension
