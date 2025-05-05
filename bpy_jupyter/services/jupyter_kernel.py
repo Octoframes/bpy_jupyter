@@ -130,7 +130,6 @@ class IPyKernel(pyd.BaseModel):
 		"""
 		with self._lock:
 			if self._kernel_app is not None:
-				print(1)
 				####################
 				# - Gently Shutdown the Kernel
 				####################
@@ -162,7 +161,6 @@ class IPyKernel(pyd.BaseModel):
 					zmq.SocketOption.LINGER,
 					0,
 				)
-				print(2)
 
 				# This part actually matters.
 				self._kernel_app.kernel.shell_stream.flush()
@@ -175,11 +173,10 @@ class IPyKernel(pyd.BaseModel):
 				######################
 				### - Manually Close Kernel Resources
 				######################
-				print(3)
-				_ = sys.stdout.flush()
-				_ = sys.stderr.flush()
+				# _ = sys.stdout.flush()
+				# _ = sys.stderr.flush()
 
-				print(4)
+				# print(4)
 				# Close I/O and Sockets
 				## Calls reset_io()
 				## - Restores sys.stdout, sys.stderr, sys.displayhook to originals.
