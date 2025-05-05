@@ -53,7 +53,7 @@ def init(*, path_connection_file: Path) -> None:
 		IPYKERNEL = IPyKernel(path_connection_file=path_connection_file)  # pyright: ignore[reportConstantRedefinition]
 
 	elif IPYKERNEL.is_running:
-		msg = "Can't re-initialize `BPY_KERNEL`, since it is running."
+		msg = "Can't re-initialize `IPYKERNEL`, since it is running."
 		raise ValueError(msg)
 
 
