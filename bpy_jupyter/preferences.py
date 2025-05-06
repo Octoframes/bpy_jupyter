@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Addon preferences, encapsulating the various global modifications that the user may make to how this addon functions."""
+"""Addon preferences, encapsulating the various global modifications that the user may make to how this addon functions.
+
+Attributes:
+	BL_REGISTER: All Blender classes from this module that should be registered.
+"""
 
 import bpy
 
@@ -25,14 +29,10 @@ from .types import EXT_PACKAGE
 # - Class: Preferences
 ####################
 class BPYJupyterAddonPrefs(bpy.types.AddonPreferences):
-	"""Manages user preferences and settings for the Blender Maxwell addon.
-
-	Unfortunately, many of the niceities based on dependencies (ex. `bl_cache.BLField`) aren't available here.
-
+	"""Manages user preferences and settings for this addon.
 
 	Attributes:
-		bl_idname: Matches `ct.addon.NAME`.
-		use_default_pydeps_path: Whether to use the default PyDeps path
+		bl_idname: Matches `__package__`.
 	"""
 
 	bl_idname: str = EXT_PACKAGE

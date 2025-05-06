@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Implements `JupyterPanel`."""
+"""Implements `JupyterPanel`.
+
+Attributes:
+	BL_REGISTER: All the Blender classes, implemented by this module, that should be registered.
+"""
 
 import textwrap
 import typing as typ

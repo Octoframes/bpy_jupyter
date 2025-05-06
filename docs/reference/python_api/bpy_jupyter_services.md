@@ -9,3 +9,7 @@
 ---
 
 ::: bpy_jupyter.services.jupyter_kernel
+
+---
+
+::: bpy_jupyter.registration

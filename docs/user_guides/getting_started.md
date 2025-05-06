@@ -1,13 +1,13 @@
 !!! abstract
-	Get going with `bpy_jupyter`!
+	Get going quickly with `bpy_jupyter`!
 
-	**Need to install `bpy_jupyter`?** See [Installation](../installation.md).
+	**Still need to install `bpy_jupyter`?** See [Installation](../installation.md).
 
 # Getting Started
 !!! warning "Warning: `uv` Required"
 	It is **strongly suggested** to install [`uv`](https://docs.astral.sh/uv/) before following this guide, using the [`uv` installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
-	`uv` ships with the `uvx` command, which makes it easy to run Python program without prior installation:
+	This is to make use of the `ucx``uv` ships with the `uvx` command, which makes it easy to run Python program without prior installation:
 
 	```bash
 	$ uvx ruff

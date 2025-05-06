@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Panels that ship with this extension."""
+"""All `bpy.types.Panel`s that ship with this extension.
+
+Attributes:
+	BL_REGISTER: All `bpy.types.Panel`s that should be registered.
+"""
 
 from . import jupyter_panel
 

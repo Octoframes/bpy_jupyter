@@ -14,4 +14,4 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Independent utilities used by this extension."""
+"""All independent, stateless utilities that ship with this extension."""

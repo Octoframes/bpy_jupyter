@@ -1,8 +1,10 @@
 !!! abstract
-	Install the `bpy_jupyter` extension in various ways!
+	Easily install the `bpy_jupyter` extension.
+
+	**Ready to use `bpy_jupyter`?** See [User Guides / Getting Started](./user_guides/getting_started.md).
 
 # Installation
-To install `bpy_jupyter`, you will already need a functional and supported version of [Blender 3D](https://www.blender.org/).
+To install `bpy_jupyter`, [Blender 3D](https://www.blender.org/) must already be installed.
 
 ### Install from `extensions.blender.org`
 !!! warning
@@ -11,10 +13,9 @@ To install `bpy_jupyter`, you will already need a functional and supported versi
 	Stay tuned!
 
 ### Install from GitHub Release
-!!! warning
-	This method is planned, but not yet implemented.
+Navigate to the [`bpy_jupyter` GitHub releases](https://github.com/Octoframes/bpy_jupyter/releases), and download the build extension `.zip` corresponding to your platform.
 
-	Stay tuned!
+After downloading, drag-and-drop the `.zip` file into Blender to install it.
 
 ### Install from Source
 !!! warning "Warning: `uv` Required"

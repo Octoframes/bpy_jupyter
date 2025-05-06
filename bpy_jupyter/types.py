@@ -17,13 +17,16 @@
 """Types, enums and constants for use throughout this extension.
 
 Attributes:
-	BLClass: All Blender classes that the user can register.
-	BLRegionType: All valid values for `bl_region_type`.
+	BLClass: A Blender class in `bpy.types` that can be registered.
+	BLContextType: A possible value for `bl_context` in `bpy.types.Panel` types.
+	PATH_MANIFEST: Path to this addon's `blender_manifest.toml` file.
+	MANIFEST: This addon's `blender_manifest.toml` as a dictionary.
+	EXT_NAME: Name of this extension.
+	EXT_PACKAGE: Value of `__package__` on the top level of this extension.
+	PANEL_TYPE_PREFIX: Extension-specific prefix to use for all values in `PanelType`.
 
-See Also:
-	Deducing Valid `bl_context`: <https://blender.stackexchange.com/questions/73145/when-declaring-a-panel-what-does-the-bl-context-value-need-to-be>
-
-
+References:
+	- Deducing Valid `bl_context`: <https://blender.stackexchange.com/questions/73145/when-declaring-a-panel-what-does-the-bl-context-value-need-to-be>
 """
 
 import enum
@@ -109,10 +112,10 @@ BLContextType: typ.TypeAlias = typ.Literal[
 ####################
 # - Load Manifest
 ####################
-PATH_MANIFEST = Path(__file__).resolve().parent / 'blender_manifest.toml'
+PATH_MANIFEST: Path = Path(__file__).resolve().parent / 'blender_manifest.toml'
 
 with PATH_MANIFEST.open('rb') as f:
-	MANIFEST = tomllib.load(f)
+	MANIFEST: dict[str, typ.Any] = tomllib.load(f)
 
 EXT_NAME: str = MANIFEST['id']
 EXT_PACKAGE: str = __package__
@@ -124,7 +127,11 @@ PANEL_TYPE_PREFIX = f'{EXT_NAME.upper()}_PT_'
 
 
 class PanelType(enum.StrEnum):
-	"""Identifiers for addon-defined `bpy.types.Panel`."""
+	"""`bl_idname` values for all addon-defined `bpy.types.Panel`s.
+
+	Attributes:
+		JupyterPanel: The `Properties -> Scene` panel that allows managing the embedded Jupyter kernel.
+	"""
 
 	JupyterPanel = f'{PANEL_TYPE_PREFIX}jupyter_panel'
 
@@ -133,7 +140,17 @@ class PanelType(enum.StrEnum):
 # - Operator Type
 ####################
 class OperatorType(enum.StrEnum):
-	"""Identifiers for addon-defined `bpy.types.Operator`."""
+	"""`bl_idname` values for all addon-defined `bpy.types.Operator`s.
+
+	Attributes:
+		StartJupyterKernel: Starts an embedded Jupyter kernel, using `bpy_jupyter.services.jupyter_kernel`.
+
+			- Also starts an `asyncio` event loop, using `bpy_jupyter.services.async_event_loop`.
+		StopJupyterKernel: Stops the embedded Jupyter kernel, using `bpy_jupyter.services.jupyter_kernel`.
+
+			- Also stops the active `asyncio` event loop, using `bpy_jupyter.services.async_event_loop`.
+		CopyKernelInfoToClipboard: Copies some string whose value depends on a running Jupyter kernel, to the system clipboard.
+	"""
 
 	StartJupyterKernel = f'{EXT_NAME}.start_jupyter_kernel'
 	StopJupyterKernel = f'{EXT_NAME}.stop_jupyter_kernel'

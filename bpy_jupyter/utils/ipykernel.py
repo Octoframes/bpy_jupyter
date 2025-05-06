@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Implements `IPyKernel`.
+"""Utilities making it easy to embed an `ipykernel` inside of another Python process.
 
 References:
 	- IPyKernel Options: <https://ipython.readthedocs.io/en/stable/config/options/kernel.html#configtrait-IPKernelApp.kernel_class>
@@ -22,8 +22,6 @@ References:
 See Also:
 	- Wrapper Kernels: <https://ipython.readthedocs.io/en/stable/development/wrapperkernels.html>
 	- Jupyter Lab w/Existing Kernels: <https://github.com/jupyterlab/jupyterlab/issues/2044>
-
-
 """
 
 import contextlib
@@ -45,9 +43,10 @@ from ipykernel.kernelapp import IPKernelApp
 # - Class: Connection INfo
 ####################
 class JupyterKernelConnectionInfo(pyd.BaseModel, frozen=True):
-	"""Complete overview of how to communicate with a running Jupyter kernel.
+	"""Structure that completely defines how to communicate with a running Jupyter kernel.
 
-	This is directly analogous to the "connection file".
+	Notes:
+		This is directly analogous, and is in fact parsed directly from, the conventional "connection file".
 
 	Attributes:
 		kernel_name: Name of the kernel.
@@ -79,13 +78,23 @@ class JupyterKernelConnectionInfo(pyd.BaseModel, frozen=True):
 
 	@functools.cached_property
 	def json_str(self) -> str:
-		"""The JSON string corresponding to this model, excluding `self.key`."""
+		"""The JSON string corresponding to this model.
+
+		Notes:
+			`self.key` is not directly included; rather a placeholder of `****`'s are included instead.
+
+			If including the real `self.key` is important, please use `self.json_str_with_key`.
+		"""
 		model_dict = self.model_dump(mode='json')
 		return json.dumps(model_dict)
 
 	@functools.cached_property
 	def json_str_with_key(self) -> str:
-		"""The JSON string corresponding to this model."""
+		"""The JSON string corresponding to this model, including the true value of `self.key`.
+
+		Notes:
+			**Use of this property should be minimized**, as the exposure of `self.key` in ex. logs may compromise the security of the kernel.
+		"""
 		model_dict = self.model_dump(mode='json')
 		model_dict['key'] = self.key.get_secret_value()
 		return json.dumps(model_dict)
@@ -101,7 +110,7 @@ class JupyterKernelConnectionInfo(pyd.BaseModel, frozen=True):
 # - Class: IPyKernel
 ####################
 class IPyKernel(pyd.BaseModel):
-	"""An abstract `ipykernel` Jupyter kernel, which wraps `ipykernel.kernelapp.IPKernelApp` and provides a clean, friendly interface for embedding in the current process.
+	"""An embeddable `ipykernel`, which wraps `ipykernel.kernelapp.IPKernelApp` in a clean, friendly interface.
 
 	Attributes:
 		path_connection_file: Path to the connection file to create
@@ -147,7 +156,7 @@ class IPyKernel(pyd.BaseModel):
 		"""Start this Jupyter kernel.
 
 		Notes:
-			An `asyncio` event loop **must be available**, since the embedded `IPKernelApp` uses this to `await` client requests.
+			An `asyncio` event loop **must be available** before kernel requests can be handled, since the embedded `IPKernelApp` uses this to `await` client requests.
 
 		Raises:
 			ValueError: If an `IPyKernel` is already running.
@@ -178,8 +187,6 @@ class IPyKernel(pyd.BaseModel):
 		"""Stop this Jupyter kernel.
 
 		Notes:
-			An `asyncio` event loop **must be available**, since the embedded `IPKernelApp` uses this to `await` client requests.
-
 			Unfortunately, `IPKernelApp` doesn't provide any kind of `stop()` function.
 			Therefore, this method involves a LOT of manual hijinks and hacks used in order to cleanly stop and vacuum the running kernel.
 

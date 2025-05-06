@@ -109,7 +109,6 @@ For static analysis, `bpy_jupyter` uses the following tools:
 To manage and build the extension, `bpy_jupyter` uses:
 - `blext`: An in-development extension project manager. For more, see [`blext` repo](https://codeberg.org/so-rose/blext).
 - `fake-bpy-module`: Auto-generated API structure for `bpy`. For more, see [`fake-bpy-module`](https://github.com/nutti/fake-bpy-module).
-- `blext`: An in-development extension project manager. For more, see [`blext` repo](https://codeberg.org/so-rose/blext).
 
 
 For documentation, we use:

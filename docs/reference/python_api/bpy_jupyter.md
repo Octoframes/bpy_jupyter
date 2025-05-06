@@ -8,8 +8,4 @@
 
 ---
 
-::: bpy_jupyter.registration
-
----
-
 ::: bpy_jupyter.types

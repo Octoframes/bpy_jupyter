@@ -32,6 +32,6 @@ To determine the specification supported by `bpy_jupyter`, please refer to the f
 
 
 ## Commit Messages
-`blext` follows the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) standard for commit messages.
+`bpy_jupyter` follows the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) standard for commit messages.
 
 Additionally, it is presumed that the `commitizen` utility is used to author commits, manipulate the extension version, and generate `CHANGELOG.md`, as defined in `pyproject.toml`.

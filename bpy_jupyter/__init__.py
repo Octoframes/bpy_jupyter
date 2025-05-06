@@ -14,9 +14,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""A visual DSL for electromagnetic simulation design and analysis implemented as a Blender node editor."""
+"""An extension that embeds a Jupyter kernel within Blender.
 
-from . import operators, panels, preferences, registration
+Attributes:
+	BL_REGISTER: All Blender classes that should be registered by `register()`.
+"""
+
+from . import operators, panels, preferences
+from .services import registration
 from .types import BLClass
 
 ####################
@@ -33,24 +38,22 @@ BL_REGISTER: list[type[BLClass]] = [
 # - Registration
 ####################
 def register() -> None:
-	"""Implements addon registration in a way that respects the availability of addon preferences and loggers.
+	"""Registers this addon, so that its functionality is available in Blender.
 
 	Notes:
-		Called by Blender when enabling the addon.
+		Called by Blender when enabling this addon.
 
-	Raises:
-		RuntimeError: If addon preferences fail to register.
+		Uses `bpy_jupyter.registration.register_classes()` to register all classes collected in `BL_REGISTER`.
 	"""
 	registration.register_classes(BL_REGISTER)
 
 
 def unregister() -> None:
-	"""Unregisters anything that was registered by the addon.
+	"""Unregisters this addon, so that its functionality is no longer available in Blender.
 
 	Notes:
 		Run by Blender when disabling and/or uninstalling the addon.
 
-		This doesn't clean `sys.modules`.
-		We rely on the hope that Blender has extension-extension module isolation.
+		Uses `bpy_jupyter.registration.unregister_classes()` to unregister all Blender classes previously registered by this addon.
 	"""
 	registration.unregister_classes()

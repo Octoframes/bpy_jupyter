@@ -24,7 +24,7 @@ import collections.abc as cabc
 
 import bpy
 
-from .types import BLClass
+from ..types import BLClass
 
 ####################
 # - Globals

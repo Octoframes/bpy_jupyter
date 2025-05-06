@@ -4,7 +4,7 @@ nav:
   - Overview: index.md
   - installation.md
   - User Guides:
-    - user_guides/getting_started.md
+    - Getting Started: user_guides/getting_started.md
   #- Resources:
   #  - resources/extension_resources.md
   #  - resources/git_resources.md

@@ -23,7 +23,7 @@ Notes:
 	Instead, such requests will hang forever / until timing out.
 
 Attributes:
-	IPYKERNEL: Wrapper for an instance of the embedded `ipython` kernel.
+	IPYKERNEL: An instance of the embedded `ipython` kernel.
 """
 
 from pathlib import Path
