@@ -1,6 +1,6 @@
 [project]
 name = "bpy_jupyter"
-version = "0.2.0"
+version = "0.3.0"
 description = "Embeds a Jupyter kernel within Blender"
 authors = [
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },

@@ -1,4 +1,4 @@
-## Unreleased
+## v0.3.0 (2025-05-06)
 
 ### ✨ Features
 
@@ -64,6 +64,8 @@
 
 ### 📝💡 Documentation
 
+- polished documentation up for deployment
+- wrote a lot of documentation
 - updated some docs and release information
 - fixed name of `bl_classes` in docstring
 - initialized `mkdocs` documentation site
