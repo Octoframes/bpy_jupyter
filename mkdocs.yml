@@ -2,18 +2,18 @@ site_name: bpy_jupyter
 
 nav:
   - Overview: index.md
-  - features.md
   - installation.md
-  #- User Guides:
-  #  - user_guides/getting_started.md
+  - User Guides:
+    - user_guides/getting_started.md
   #- Resources:
   #  - resources/extension_resources.md
   #  - resources/git_resources.md
   - Reference:
     - Release Notes: reference/release_notes.md
-    #- Policies:
-    #  - reference/policies/versioning.md
-    #  - reference/policies/licensing.md
+    - reference/contributing.md
+    - Policies:
+      - reference/policies/versioning.md
+      - reference/policies/licensing.md
     #  - reference/policies/contributing.md
     #  - reference/policies/schemas.md
     - Python API:
@@ -24,6 +24,9 @@ nav:
       - reference/python_api/bpy_jupyter_utils.md
 
 markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
   - admonition
   - pymdownx.superfences
   - footnotes
@@ -52,6 +55,7 @@ plugins:
 - offline
 - gh-admonitions
 - macros
+
 - mkdocstrings:
     handlers:
       python:

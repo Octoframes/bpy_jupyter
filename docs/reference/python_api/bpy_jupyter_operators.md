@@ -4,7 +4,7 @@
 
 ---
 
-::: bpy_jupyter.operators.copy_kern_conn_path_to_clip
+::: bpy_jupyter.operators.copy_kern_info_to_clipboard
 
 ---
 

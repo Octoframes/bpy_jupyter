@@ -2,10 +2,18 @@
 
 ### ✨ Features
 
+- comprehensive new UI
 - polished up with last fixes, docs, and tooling
+
+### 🐛🚑️ Fixes
+
+- don't start `asyncio` event loop when `bpy.app.online_access` is disabled
+- respect `bpy.app.online_access`
 
 ### BREAKING CHANGE
 
+- Users can no longer rely on `anywidget` by default.
+- Use of the extension now requires enabling `bpy.app.online_access`.
 - The extension no longer provides a web service. Please use the kernel connection file directly, or with an externally defined web service.
 
 ### chore
@@ -49,3 +57,13 @@
 ### refactor
 
 - general refactor w/correct dependencies
+
+### 📌➕⬇️➖⬆️ Dependencies
+
+- remove dependency on `anywidget`
+
+### 📝💡 Documentation
+
+- updated some docs and release information
+- fixed name of `bl_classes` in docstring
+- initialized `mkdocs` documentation site
