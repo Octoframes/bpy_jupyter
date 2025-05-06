@@ -1,7 +1,7 @@
 [project]
 name = "bpy_jupyter"
 version = "0.2.0"
-description = "Run a Jupyter kernel embedded asynchronously within Blender"
+description = "An embedded Jupyter ipykernel"
 authors = [
     { name = "Sofus Albert Høgsbro Rose", email = "bpyjupyter@sofusrose.com" },
 ]
@@ -55,10 +55,10 @@ blender4_4 = [
 ]
 
 [tool.blext]
-pretty_name = "BPY Jupyter"
+pretty_name = "bpy Jupyter"
 blender_version_min = '4.3.0'
 blender_version_max = '4.5.0'
-bl_tags = ["Development", "Import-Export", "Pipeline"]
+bl_tags = ["Development", "Import-Export", "Pipeline", "System"]
 copyright = ["2025 bpy_jupyter Contributors"]
 
 supported_platforms = [
@@ -69,8 +69,9 @@ supported_platforms = [
 ]
 
 [tool.blext.permissions]
-files = 'Creates a Jupyter kernel connection file on the filesystem'
-network = 'Exposes five sockets to communicate with the Jupyter kernel'
+files = 'Create, delete Jupyter kernel connection file'
+network = 'Expose Jupyter kernel sockets'
+clipboard = 'Copy Jupyter kernel information to the clipboard'
 
 ####################
 # - Blender Extension
