@@ -29,13 +29,72 @@ See Also:
 import contextlib
 import functools
 import gc
+import ipaddress
+import json
 import sys
 import threading
+import typing as typ
 from pathlib import Path
 
 import pydantic as pyd
 import zmq
 from ipykernel.kernelapp import IPKernelApp
+
+
+####################
+# - Class: Connection INfo
+####################
+class JupyterKernelConnectionInfo(pyd.BaseModel, frozen=True):
+	"""Complete overview of how to communicate with a running Jupyter kernel.
+
+	This is directly analogous to the "connection file".
+
+	Attributes:
+		kernel_name: Name of the kernel.
+		ip: The IP address that the kernel binds ports to.
+		shell_port: Port of the kernel shell socket.
+		iopub_port: Port of the kernel iopub socket.
+		stdin_port: Port of the kernel stdin socket.
+		control_port: Port of the kernel control socket.
+		hb_port: Port of the kernel heartbeat socket.
+		key: Secret key that should be used to authenticate with the kernel.
+		transport: Protocol that should be used to communicate with the kernel.
+		signature_scheme: Cipher suite that should be used to validate message authenticity.
+
+	"""
+
+	ip: ipaddress.IPv4Address | ipaddress.IPv4Address
+
+	shell_port: int
+	iopub_port: int
+	stdin_port: int
+	control_port: int
+	hb_port: int
+
+	key: pyd.SecretStr
+	transport: typ.Literal['tcp']
+	signature_scheme: typ.Literal['hmac-sha256']
+
+	kernel_name: str
+
+	@functools.cached_property
+	def json_str(self) -> str:
+		"""The JSON string corresponding to this model, excluding `self.key`."""
+		model_dict = self.model_dump(mode='json')
+		return json.dumps(model_dict)
+
+	@functools.cached_property
+	def json_str_with_key(self) -> str:
+		"""The JSON string corresponding to this model."""
+		model_dict = self.model_dump(mode='json')
+		model_dict['key'] = self.key.get_secret_value()
+		return json.dumps(model_dict)
+
+	@classmethod
+	def from_path_connection_file(cls, path_connection_file: Path) -> typ.Self:
+		"""Construct from a Jupyter kernel connection file, including `self.key`."""
+		with path_connection_file.open('r') as f:
+			return cls(**json.load(f))
 
 
 ####################
@@ -66,9 +125,20 @@ class IPyKernel(pyd.BaseModel):
 	####################
 	@functools.cached_property
 	def is_running(self) -> bool:
-		"""Whether this `ipython` Jupyter kernel is currently running."""
+		"""Whether this Jupyter kernel is currently running."""
 		with self._lock:
 			return self._kernel_app is not None
+
+	@functools.cached_property
+	def connection_info(self) -> JupyterKernelConnectionInfo:
+		"""Parsed kernel connection file for the currently running Jupyter kernel."""
+		with self._lock:
+			if self._kernel_app is not None:
+				return JupyterKernelConnectionInfo.from_path_connection_file(
+					self.path_connection_file
+				)
+			msg = "Connection information can't be parsed for IPyKernel, since it's not running."
+			raise ValueError(msg)
 
 	####################
 	# - Methods: Lifecycle
@@ -88,6 +158,7 @@ class IPyKernel(pyd.BaseModel):
 				# - First new use will wait for the lock we currently hold.
 				with contextlib.suppress(AttributeError):
 					del self.is_running
+					del self.connection_info
 
 				####################
 				# - Start the Kernel w/o sys.stdout Suppression
@@ -98,9 +169,6 @@ class IPyKernel(pyd.BaseModel):
 				)
 				self._kernel_app.initialize([sys.executable])
 				self._kernel_app.kernel.start()
-
-				with contextlib.suppress(AttributeError):
-					del self.is_running
 
 			else:
 				msg = "IPyKernel can't be started, since it's already running."
@@ -141,6 +209,7 @@ class IPyKernel(pyd.BaseModel):
 				# - First new use will wait for the lock we currently hold.
 				with contextlib.suppress(AttributeError):
 					del self.is_running
+					del self.connection_info
 
 				####################
 				# - Gently Shutdown the Kernel

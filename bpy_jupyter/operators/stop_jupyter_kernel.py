@@ -63,12 +63,10 @@ class StopJupyterKernel(bpy.types.Operator):
 			context: The current `bpy` context.
 				_Not used._
 		"""
-		# Stop Jupyter Kernel
+		# Stop Jupyter Kernel and asyncio Event Loop
 		if jupyter_kernel.IPYKERNEL is not None:
 			jupyter_kernel.IPYKERNEL.stop()
-
-		# Stop Event Loop
-		async_event_loop.stop()
+			async_event_loop.stop()
 
 		return {'FINISHED'}
 

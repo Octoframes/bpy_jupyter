@@ -137,4 +137,4 @@ class OperatorType(enum.StrEnum):
 
 	StartJupyterKernel = f'{EXT_NAME}.start_jupyter_kernel'
 	StopJupyterKernel = f'{EXT_NAME}.stop_jupyter_kernel'
-	CopyKernConnPath = f'{EXT_NAME}.copy_kern_conn_path'
+	CopyKernelInfoToClipboard = f'{EXT_NAME}.copy_kernel_info_to_clipboard'

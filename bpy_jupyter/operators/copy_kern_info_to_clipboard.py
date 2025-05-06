@@ -32,16 +32,19 @@ if typ.TYPE_CHECKING:
 ####################
 # - Constants
 ####################
-class CopyKernConnPath(bpy.types.Operator):
-	"""Copy the path to the kernel connection file to the clipboard.
+class CopyKernelInfoToClipboard(bpy.types.Operator):
+	"""Copy a value to the system clipboard.
 
 	Attributes:
 		bl_idname: Name of this operator type.
 		bl_label: Human-oriented label for this operator.
+		value_to_copy: Operator property containing the string to copy.
 	"""
 
-	bl_idname: str = OperatorType.CopyKernConnPath
+	bl_idname: str = OperatorType.CopyKernelInfoToClipboard
 	bl_label: str = 'Copy Kernel Connection Path'
+
+	value_to_copy: bpy.props.StringProperty('')  # pyright: ignore[reportInvalidTypeForm, reportCallIssue, reportUninitializedInstanceVariable]
 
 	@typ_ext.override
 	@classmethod
@@ -64,16 +67,11 @@ class CopyKernConnPath(bpy.types.Operator):
 			context: The current `bpy` context.
 				_Not used._
 		"""
-		if jupyter_kernel.IPYKERNEL is None:
-			msg = "IPyKernel is `None`. This is a bug - generally, `poll()` should guarantee that this doesn't happen."
-			raise RuntimeError(msg)
-
-		path_connection_file = jupyter_kernel.IPYKERNEL.path_connection_file
-		pyperclipfix.copy(str(path_connection_file))
+		pyperclipfix.copy(str(self.value_to_copy))  # pyright: ignore[reportUnknownArgumentType]
 
 		self.report(
 			{'INFO'},
-			'Copied IPyKernel Connection File Path to Clipboard.',
+			'Copied Jupyter Kernel Value to Clipboard',
 		)
 		return {'FINISHED'}
 
@@ -81,4 +79,4 @@ class CopyKernConnPath(bpy.types.Operator):
 ####################
 # - Blender Registration
 ####################
-BL_REGISTER = [CopyKernConnPath]
+BL_REGISTER = [CopyKernelInfoToClipboard]

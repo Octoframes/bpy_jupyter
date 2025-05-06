@@ -71,7 +71,6 @@ class StartJupyterKernel(bpy.types.Operator):
 				create=True,
 			)
 		).resolve()
-		## TODO: Get from preferences.
 
 		# (Re)Initialize Jupyter Kernel
 		jupyter_kernel.init(
@@ -82,14 +81,8 @@ class StartJupyterKernel(bpy.types.Operator):
 
 		# Start Jupyter Kernel and asyncio Event Loop
 		if jupyter_kernel.IPYKERNEL is not None:
-			if bpy.app.online_access:
-				jupyter_kernel.IPYKERNEL.start()
-				async_event_loop.start()
-			else:
-				self.report(
-					{'ERROR'},
-					'Could not start the Jupyter kernel, since online access is forbidden.',
-				)
+			jupyter_kernel.IPYKERNEL.start()
+			async_event_loop.start()
 
 		return {'FINISHED'}
 

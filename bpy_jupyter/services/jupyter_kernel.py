@@ -36,6 +36,9 @@ from ..utils.ipykernel import IPyKernel
 IPYKERNEL: IPyKernel | None = None
 
 
+####################
+# - Lifecycle
+####################
 def init(*, path_connection_file: Path) -> None:
 	"""Initialize the IPyKernel using the given connection file path.
 
@@ -57,6 +60,9 @@ def init(*, path_connection_file: Path) -> None:
 		raise ValueError(msg)
 
 
+####################
+# - Information
+####################
 def is_kernel_running() -> bool:
 	"""Whether the kernel is both initialized and running.
 
