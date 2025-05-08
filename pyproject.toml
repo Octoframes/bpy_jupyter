@@ -37,7 +37,7 @@ Homepage = "https://kolibril13.github.io/bpy-gallery/"
 [tool.blext]
 pretty_name = "BPY Jupyter"
 blender_version_min = '4.2.0'
-blender_version_max = '4.3.10'
+blender_version_max = '4.4.10'
 bl_tags = ["Development", "Import-Export", "Pipeline"]
 copyright = ["2024 bpy_jupyter Contributors"]
 
