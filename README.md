@@ -1,6 +1,7 @@
 # `bpy_jupyter`
 A [Blender](https://www.blender.org/) extension fusing the flexibility of notebook-based data-viz, with the visual appeal of modern computer graphics software.
 
+INFO: there's a newer version for Blender 5.1 + here: https://github.com/kolibril13/jupyter-blender
 ---
 
 **Documentation**: <https://sorose-bpy-jupyter.pgs.sh/>
